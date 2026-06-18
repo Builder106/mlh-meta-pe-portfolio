@@ -9,7 +9,7 @@ or route changes needed.
 ADDING YOURSELF (teammates start here):
   1. Copy the MEMBER_TEMPLATE block at the bottom into MEMBERS.
   2. Fill in your real details. `handle` becomes your URL + nav tab.
-  3. Drop a square photo at app/static/img/<your-handle>.jpg.
+  3. Drop a square photo at app/static/photos/<your-handle>.jpg.
   4. `flask run` → you're on the fleet overview and have your own page.
 """
 
@@ -38,7 +38,7 @@ MEMBERS = [
         "role": "Production Engineering Fellow",
         "status": "OPERATIONAL",
         "region": "us-east-1",
-        "avatar": "img/olayinka-vaughan.jpg",
+        "avatar": "photos/olayinka-vaughan.jpg",
         "tagline": "I build low-level systems, and I care most about the parts "
                    "that have to keep running.",
         "stack": ["OCaml", "Rust", "Go", "TypeScript", "Python", "C", "Linux"],
@@ -189,13 +189,13 @@ MEMBERS = [
             {
                 "title": "Piano",
                 "summary": "I've played piano for years, including at my church.",
-                "image": "img/hobby-piano.jpg",
+                "image": "photos/hobby-piano.jpg",
             },
             {
                 "title": "Basketball",
                 "summary": "Pickup basketball at the local courts — my main way "
                            "to get off the screen and outside.",
-                "image": "img/hobby-basketball.jpg",
+                "image": "photos/hobby-basketball.jpg",
             },
         ],
 
@@ -204,7 +204,7 @@ MEMBERS = [
     },
 
     # TODO(teammates): add yourself below. Copy MEMBER_TEMPLATE, fill it in, and
-    # drop a square photo at app/static/img/<your-handle>.jpg.
+    # drop a square photo at app/static/photos/<your-handle>.jpg.
 ]
 
 
@@ -234,7 +234,7 @@ MEMBER_TEMPLATE = {
     "role": "Production Engineering Fellow",
     "status": "OPERATIONAL",
     "region": "us-east-1",             # pick anything; it's flavor
-    "avatar": "img/first-last.jpg",    # drop a square photo here
+    "avatar": "photos/first-last.jpg",    # drop a square photo here
     "tagline": "One line on what you build.",
     "stack": ["Python", "..."],
     "links": {"github": "https://github.com/your-gh-username"},
@@ -249,7 +249,7 @@ MEMBER_TEMPLATE = {
          "location": "City", "term": "Class of 20XX", "detail": ""},
     ],
     "hobbies": [
-        {"title": "Hobby", "summary": "One line.", "image": "img/your-hobby.jpg"},
+        {"title": "Hobby", "summary": "One line.", "image": "photos/your-hobby.jpg"},
     ],
     "places": [
         {"city": "City", "country": "Country", "lat": 0.0, "lng": 0.0,

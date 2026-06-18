@@ -28,7 +28,7 @@ Python 3.12+.)
    bottom into the `MEMBERS` list.
 2. Fill in your details. `handle` (lowercase-dashes) becomes your URL and your
    nav tab. `hobbies`, `education`, and `places` can start as `[]`.
-3. Drop a **square** photo at `app/static/img/<your-handle>.jpg`.
+3. Drop a **square** photo at `app/static/photos/<your-handle>.jpg`.
 4. `flask run` — you're on the fleet overview, you have a page at
    `/u/<your-handle>`, your hobbies show on `/ps_aux`, and the menu grew a tab.
    You changed zero templates.
