@@ -199,8 +199,14 @@ MEMBERS = [
             },
         ],
 
-        # places travelled (map) — added in a later PR. kind: home|origin|visited
-        "places": [],
+        # places travelled (map). kind: home | origin | visited
+        "places": [
+            {"city": "Middletown", "country": "USA", "lat": 41.5623,
+             "lng": -72.6506, "kind": "home", "note": "Wesleyan — where I study"},
+            {"city": "Lagos", "country": "Nigeria", "lat": 6.5244,
+             "lng": 3.3792, "kind": "origin", "note": "where I'm from"},
+            # TODO(you): add every city you've actually travelled to.
+        ],
     },
 
     # TODO(teammates): add yourself below. Copy MEMBER_TEMPLATE, fill it in, and
