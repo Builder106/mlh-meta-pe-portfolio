@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section class="hero" style="display:block">
+  <h1>{{ pod.name }}</h1>
+  <p class="lead" style="margin-top:10px;max-width:54ch">{{ pod.tagline }}</p>
+</section>
+
+<section class="section section--first" id="team">
+  <h2>The team</h2>
+  <div class="team">
+    {% for m in members %}
+    <a class="team-card" href="{{ url_for('member', handle=m.handle) }}">
+      <img class="team-photo" src="{{ url_for('static', filename=m.avatar) }}"
+           alt="{{ m.name }}" loading="lazy" width="56" height="56">
+      <span class="team-id">
+        <span class="team-name">{{ m.name }}</span><br>
+        <span class="team-role">{{ m.role }}</span>
+      </span>
+      <span class="team-go">View →</span>
+    </a>
+    {% endfor %}
+  </div>
+
+  {% if members | length == 1 %}
+  <p class="note">More teammates coming — add yourself to <code>MEMBERS</code> in
+    <code>app/data.py</code> (see <a href="{{ pod.repo }}/blob/main/CONTRIBUTING.md">CONTRIBUTING</a>)
+    and you'll appear here.</p>
+  {% endif %}
+</section>
+
+{% endblock %}

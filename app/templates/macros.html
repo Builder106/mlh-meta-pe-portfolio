@@ -1,0 +1,46 @@
+{# Reusable Jinja macros — the "template for adding multiple work experiences /
+   educations / hobbies". Each macro renders one record; the pages just loop. #}
+
+{# One experience / project entry. #}
+{% macro experience_item(item) %}
+<article class="item">
+  <div class="item-top">
+    <div>
+      <div class="item-title">{{ item.service }}</div>
+      <div class="item-role">{{ item.role }}</div>
+    </div>
+    <span class="item-date">{{ item.ts }}</span>
+  </div>
+  <p class="item-summary">{{ item.summary }}</p>
+  {% if item.metric %}<div class="item-metric"><b>{{ item.metric }}</b></div>{% endif %}
+  {% if item.stack %}<div class="tags">{% for t in item.stack %}<span class="tag">{{ t }}</span>{% endfor %}</div>{% endif %}
+  {% if item.url %}<a class="item-link" href="{{ item.url }}" target="_blank" rel="noopener">View →</a>{% endif %}
+</article>
+{% endmacro %}
+
+{# One education entry. #}
+{% macro education_item(edu) %}
+<article class="item">
+  <div class="item-top">
+    <div>
+      <div class="item-title">{{ edu.institution }}</div>
+      <div class="item-role">{{ edu.credential }}</div>
+    </div>
+    <span class="item-date">{{ edu.term }}</span>
+  </div>
+  <p class="item-summary">{{ edu.location }}{% if edu.detail %} · {{ edu.detail }}{% endif %}</p>
+</article>
+{% endmacro %}
+
+{# One hobby card. `owner_handle` is set only on the fleet-wide page. #}
+{% macro hobby_card(h) %}
+<article class="hobby">
+  <img class="hobby-img" src="{{ url_for('static', filename=h.image) }}"
+       alt="{{ h.title }}" loading="lazy" width="640" height="480">
+  <div class="hobby-body">
+    {% if h.owner_handle %}<a class="hobby-owner" href="{{ url_for('member', handle=h.owner_handle) }}">{{ h.owner }}</a>{% endif %}
+    <h3>{{ h.title }}</h3>
+    <p>{{ h.summary }}</p>
+  </div>
+</article>
+{% endmacro %}

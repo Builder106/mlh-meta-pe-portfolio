@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="{{ pod.label }} — {{ pod.tagline }}">
+  <meta property="og:title" content="{{ pod.name }} — {{ pod.label }}">
+  <meta property="og:description" content="{{ pod.tagline }}">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="{{ site_url }}">
+  <meta name="theme-color" content="#ffffff">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles/main.css') }}">
+  <link rel="icon" href="{{ url_for('static', filename='img/favicon.svg') }}" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="{{ url_for('static', filename='img/apple-touch-icon.png') }}">
+  {% block head %}{% endblock %}
+  <title>{{ title }}</title>
+</head>
+
+<body>
+  <a href="#main" class="skip">Skip to content</a>
+
+  <!-- MLH program ribbon — the template's banner, slimmed to a strip. -->
+  <div class="ribbon">
+    <div class="ribbon-inner">
+      <a href="https://fellowship.mlh.io" target="_blank" rel="noopener" aria-label="MLH Fellowship">
+        <img src="{{ url_for('static', filename='img/mlh-logo.svg') }}" alt="MLH Fellowship" height="22">
+      </a>
+      <span class="ribbon-label">Production Engineering · {{ pod.cohort }}</span>
+    </div>
+  </div>
+
+  <header class="nav">
+    <div class="nav-inner">
+      <a class="nav-brand" href="{{ url_for('fleet') }}">{{ pod.name }}</a>
+      <!-- Dynamic nav: built in app/__init__.py from MEMBERS. Add a member and a
+           tab (their first name) + a page appear automatically. -->
+      <nav class="nav-links" aria-label="Primary">
+        {% for item in nav %}
+        <a class="{{ 'active' if item.active }}" href="{{ item.url }}"
+           {{ 'aria-current=page' if item.active }}>{{ item.label }}</a>
+        {% endfor %}
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" class="wrap">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <span>{{ pod.name }} · MLH × Meta Production Engineering</span>
+      <span><a href="{{ pod.repo }}" target="_blank" rel="noopener">Source on GitHub</a></span>
+    </div>
+  </footer>
+
+  {% block scripts %}{% endblock %}
+</body>
+
+</html>
