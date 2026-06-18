@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% import "macros.html" as ui %}
+
+{% block head %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+{% endblock %}
+
+{% block content %}
+
+<a class="crumb" href="{{ url_for('fleet') }}">← {{ pod.name }} team</a>
+
+<section class="hero">
+  <img class="hero-photo" src="{{ url_for('static', filename=member.avatar) }}"
+       alt="Photo of {{ member.name }}" width="108" height="108">
+  <div>
+    <h1>{{ member.name }}</h1>
+    <div class="role">{{ member.role }}</div>
+    <p class="bio">{{ member.tagline }}</p>
+    {% if member.links %}
+    <div class="hero-links">
+      {% if member.links.site %}<a href="{{ member.links.site }}" target="_blank" rel="noopener">Website</a>{% endif %}
+      {% if member.links.github %}<a href="{{ member.links.github }}" target="_blank" rel="noopener">GitHub</a>{% endif %}
+      {% if member.links.email %}<a href="{{ member.links.email }}">Email</a>{% endif %}
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+{% if member.about %}
+<section class="section section--first" id="about">
+  <h2>About</h2>
+  <div class="prose">{% for para in member.about %}<p>{{ para }}</p>{% endfor %}</div>
+</section>
+{% endif %}
+
+{% if member.experience %}
+<section class="section" id="experience">
+  <h2>Experience &amp; projects</h2>
+  {% for item in member.experience %}{{ ui.experience_item(item) }}{% endfor %}
+</section>
+{% endif %}
+
+{% if member.education %}
+<section class="section" id="education">
+  <h2>Education</h2>
+  {% for edu in member.education %}{{ ui.education_item(edu) }}{% endfor %}
+</section>
+{% endif %}
+
+{% if member.places %}
+<section class="section" id="travel">
+  <h2>Places I've been</h2>
+  <p class="map-note">{{ member.places | length }} place{{ 's' if member.places | length != 1 }} on the map.</p>
+  <div id="map" role="img" aria-label="Map of places {{ member.name }} has visited"></div>
+</section>
+{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+{% if member.places %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script>
+  const PLACES = {{ member.places | tojson }};
+  const map = L.map('map', { scrollWheelZoom: false, attributionControl: true, worldCopyJump: true })
+                .setView([24, -20], 2);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    attribution: '© OpenStreetMap · © CARTO', subdomains: 'abcd', maxZoom: 19
+  }).addTo(map);
+  const ACCENT = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#1c539f';
+  const bounds = [];
+  PLACES.forEach(p => {
+    L.circleMarker([p.lat, p.lng], {
+      radius: 7, color: ACCENT, weight: 2, fillColor: ACCENT, fillOpacity: 0.55
+    }).addTo(map).bindPopup('<b>' + p.city + ', ' + p.country + '</b>' + (p.note ? '<br>' + p.note : ''));
+    bounds.push([p.lat, p.lng]);
+  });
+  if (bounds.length > 1) { map.fitBounds(bounds, { padding: [50, 50], maxZoom: 5 }); }
+</script>
+{% endif %}
+{% endblock %}
