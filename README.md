@@ -75,8 +75,9 @@ app/
 ├── __init__.py          # Flask app, routes, MEMBERS-driven nav, 404 handler
 ├── data.py              # ← POD + MEMBERS (all content lives here)
 ├── static/
-│   ├── img/             # favicon, per-member avatars + hobby photos
-│   └── styles/main.css  # the "ops console" design system
+│   ├── img/             # site chrome: favicon, Apple icon, MLH logo
+│   ├── photos/          # member avatars + hobby photos (your content)
+│   └── styles/main.css  # the design system
 └── templates/
     ├── base.html        # layout: dynamic nav + footer status bar
     ├── macros.html      # reusable Jinja macros for repeating sections
@@ -90,7 +91,7 @@ app/
 
 This is a team repo — see **[CONTRIBUTING.md](CONTRIBUTING.md)**. The short
 version: copy `MEMBER_TEMPLATE` in [`app/data.py`](app/data.py) into `MEMBERS`,
-drop a square photo at `app/static/img/<your-handle>.jpg`, and open a PR. You'll
+drop a square photo at `app/static/photos/<your-handle>.jpg`, and open a PR. You'll
 get your own page and a nav tab automatically.
 
 ## License
