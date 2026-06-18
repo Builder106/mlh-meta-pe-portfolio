@@ -184,8 +184,20 @@ MEMBERS = [
             },
         ],
 
-        # hobbies (with images) — added in a later PR.
-        "hobbies": [],
+        # hobbies (with images).
+        "hobbies": [
+            {
+                "title": "Piano",
+                "summary": "I've played piano for years, including at my church.",
+                "image": "img/hobby-piano.jpg",
+            },
+            {
+                "title": "Basketball",
+                "summary": "Pickup basketball at the local courts — my main way "
+                           "to get off the screen and outside.",
+                "image": "img/hobby-basketball.jpg",
+            },
+        ],
 
         # places travelled (map) — added in a later PR. kind: home|origin|visited
         "places": [],

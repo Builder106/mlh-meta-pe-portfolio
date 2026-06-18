@@ -1,9 +1,10 @@
 """Flask app for the pod portfolio.
 
 The site is an ops console for a *fleet*: the pod is a cluster, each teammate is
-a service. ``/`` lists the fleet and ``/u/<handle>`` is a service's detail page.
-All content comes from ``app.data`` so templates stay logic-light, and the menu
-bar is generated from ``MEMBERS`` — add a member and a tab + a page appear.
+a service. ``/`` lists the fleet, ``/u/<handle>`` is a service's detail page, and
+``/ps_aux`` is the fleet-wide background-process (hobbies) view. All content comes
+from ``app.data`` so templates stay logic-light, and the menu bar is generated
+from ``MEMBERS`` — add a member and a tab + a page appear automatically.
 """
 import os
 from datetime import datetime, timezone
@@ -20,8 +21,8 @@ app = Flask(__name__)
 
 @app.context_processor
 def inject_globals():
-    """Build the dynamic nav (fleet + a tab per member) and expose the pod to
-    every template. Active tab is resolved from the current endpoint."""
+    """Build the dynamic nav (fleet + a tab per member + ps_aux) and expose the
+    pod to every template. Active tab is resolved from the current endpoint."""
     nav = [{"label": "Team", "url": url_for("fleet"),
             "active": request.endpoint == "fleet"}]
     for m in data.MEMBERS:
@@ -31,6 +32,8 @@ def inject_globals():
             "active": (request.endpoint == "member"
                        and request.view_args.get("handle") == m["handle"]),
         })
+    nav.append({"label": "Hobbies", "url": url_for("hobbies"),
+                "active": request.endpoint == "hobbies"})
     return {
         "nav": nav,
         "pod": data.POD,
@@ -54,6 +57,12 @@ def member(handle):
                            title=f"{m['name']} — {data.POD['name']}", member=m)
 
 
+@app.route("/ps_aux")
+def hobbies():
+    return render_template("hobbies.html", title=f"Hobbies — {data.POD['name']}",
+                           procs=data.all_hobbies())
+
+
 @app.route("/healthz")
 def healthz():
     """Liveness probe — because of course a fleet has one."""
@@ -63,7 +72,8 @@ def healthz():
         region=data.POD["region"],
         cohort=data.POD["cohort"],
         services=[m["handle"] for m in data.MEMBERS],
-        checks={"members": len(data.MEMBERS)},
+        checks={"members": len(data.MEMBERS),
+                "processes": len(data.all_hobbies())},
         ts=datetime.now(timezone.utc).isoformat(),
     )
 
