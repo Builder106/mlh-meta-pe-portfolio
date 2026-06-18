@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% import "macros.html" as ui %}
+
+{% block content %}
+<section class="section section--first" id="hobbies">
+  <h2>Hobbies</h2>
+  <p class="lead" style="margin-bottom:22px">What the team gets up to off the clock.</p>
+
+  {% if procs %}
+  <div class="hobbies">
+    {% for h in procs %}{{ ui.hobby_card(h) }}{% endfor %}
+  </div>
+  {% else %}
+  <p class="note">No hobbies added yet — add some to a member in <code>app/data.py</code>.</p>
+  {% endif %}
+</section>
+{% endblock %}
