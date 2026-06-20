@@ -1,7 +1,6 @@
 # `26.SUM.B.6` — a pod, rendered as a fleet
 
-> A team portfolio for our MLH × Meta Production Engineering pod. The site is an
-> **ops console for a fleet**: the pod is a cluster, each teammate is a service.
+> A team portfolio for our MLH × Meta Production Engineering pod.
 > Built with Flask + Jinja for Week 1 of the fellowship.
 
 [![CI](https://github.com/Builder106/MLH-Meta-PE-Portfolio/actions/workflows/ci.yml/badge.svg)](https://github.com/Builder106/MLH-Meta-PE-Portfolio/actions/workflows/ci.yml)
@@ -13,11 +12,9 @@
 ## The idea
 
 Week 1's rubric is a list of generic portfolio tasks (about, work, education,
-hobbies, a travel map). Rather than fill the stock blue template, the whole site
-is reframed as a **status page for a pod**:
+hobbies, a travel map).
 
-- **`/`** — the **fleet overview**: every teammate listed as a service, with
-  status, region, and a deploy count.
+- **`/`** — the **overview**: every teammate listed
 - **`/u/<handle>`** — a member's detail page, where the rubric rows become
   systems primitives:
 
@@ -29,11 +26,10 @@ is reframed as a **status page for a pod**:
   | Education | **build provenance** — where the build was compiled from |
   | Travel map | **edge network** — visited cities as Points of Presence |
 
-- **`/ps_aux`** — a **fleet-wide** background-process view: everyone's hobbies as
+- **`/ps_aux`** — everyone's hobbies as
   running processes, tagged by owner.
 
-The menu bar and every member page are generated from one `MEMBERS` list, so
-adding a teammate is a data edit, not a template change.
+The menu bar and every member page are generated from one `MEMBERS` list, so adding a teammate is a data edit, not a template change.
 
 ## Quickstart
 
