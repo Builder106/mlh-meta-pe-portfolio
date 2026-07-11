@@ -2,6 +2,16 @@
 
 > Dated log of decisions and notes. Reverse-chronological; one paragraph max.
 
+## 2026-07-11 — Timeline deployed to the VPS #milestone
+
+Installed `mysql-server` 8.0 on the CentOS Stream 9 box (the AppStream module
+had it), then ran the equivalent of `mysql_secure_installation` by hand:
+scoped the app's grant to `myportfoliodb.*` instead of the `*.*` the
+assignment uses for local dev, dropped any anonymous accounts, and set a
+generated root password instead of leaving root passwordless on a box that's
+open to the internet. `redeploy-site.sh` handled the rest without changes.
+`curl-test.sh` passes against the live server.
+
 ## 2026-07-11 — MySQL-backed timeline #decision
 
 Week 4 calls for a public timeline (peewee + MySQL) added to the existing routes.
