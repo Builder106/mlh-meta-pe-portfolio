@@ -43,6 +43,7 @@ class TimelinePost(Model):
     email = CharField()
     content = TextField()
     event_date = DateField(null=True)
+    image = CharField(null=True, max_length=500)
     created_at = DateTimeField(default=lambda: datetime.now(timezone.utc))
 
     class Meta:
@@ -52,9 +53,11 @@ class TimelinePost(Model):
 db.connect()
 db.create_tables([TimelinePost])
 existing_columns = {c.name for c in db.get_columns(TimelinePost._meta.table_name)}
+migrator = MySQLMigrator(db)
 if "event_date" not in existing_columns:
-    migrate(MySQLMigrator(db).add_column(
-        TimelinePost._meta.table_name, "event_date", TimelinePost.event_date))
+    migrate(migrator.add_column(TimelinePost._meta.table_name, "event_date", TimelinePost.event_date))
+if "image" not in existing_columns:
+    migrate(migrator.add_column(TimelinePost._meta.table_name, "image", TimelinePost.image))
 db.close()
 
 
@@ -136,6 +139,7 @@ def create_timeline_post():
     email = (payload.get("email") or "").strip()
     content = (payload.get("content") or "").strip()
     event_date_raw = (payload.get("event_date") or "").strip()
+    image = (payload.get("image") or "").strip()
     if not name or not email or not content:
         return jsonify(error="name, email, and content are all required"), 400
     event_date = None
@@ -144,7 +148,10 @@ def create_timeline_post():
             event_date = datetime.strptime(event_date_raw, "%Y-%m-%d").date()
         except ValueError:
             return jsonify(error="event_date must be YYYY-MM-DD"), 400
-    post = TimelinePost.create(name=name, email=email, content=content, event_date=event_date)
+    if image and not image.startswith(("http://", "https://", "/static/")):
+        return jsonify(error="image must be an http(s) URL"), 400
+    post = TimelinePost.create(name=name, email=email, content=content,
+                               event_date=event_date, image=image or None)
     return jsonify(serialize_post(post)), 201
 
 

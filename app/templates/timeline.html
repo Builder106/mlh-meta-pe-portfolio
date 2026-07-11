@@ -16,10 +16,16 @@
         <input type="email" name="email" autocomplete="email" required maxlength="160" placeholder="ada@example.com">
       </label>
     </div>
-    <label class="field field-date">
-      <span>Date (optional — defaults to today)</span>
-      <input type="date" name="event_date" max="{{ now.strftime('%Y-%m-%d') }}">
-    </label>
+    <div class="field-row">
+      <label class="field field-date">
+        <span>Date (optional — defaults to today)</span>
+        <input type="date" name="event_date" max="{{ now.strftime('%Y-%m-%d') }}">
+      </label>
+      <label class="field">
+        <span>Image URL (optional)</span>
+        <input type="url" name="image" maxlength="500" placeholder="https://example.com/screenshot.png">
+      </label>
+    </div>
     <label class="field">
       <span>Update</span>
       <textarea name="content" required maxlength="2000" rows="3" placeholder="Just shipped a new feature..."></textarea>
@@ -43,6 +49,9 @@
               <span class="timeline-date">{{ post.day_label }}</span>
               <span class="timeline-name">{{ post.name }}</span>
             </div>
+            {% if post.image %}
+            <img class="timeline-image" src="{{ post.image }}" alt="" loading="lazy">
+            {% endif %}
             <p class="timeline-content">{{ post.content }}</p>
           </div>
         </li>
@@ -98,12 +107,22 @@
     name.textContent = post.name;
 
     meta.append(date, name);
+    body.append(meta);
+
+    if (post.image) {
+      const img = document.createElement("img");
+      img.className = "timeline-image";
+      img.src = post.image;
+      img.alt = "";
+      img.loading = "lazy";
+      body.append(img);
+    }
 
     const content = document.createElement("p");
     content.className = "timeline-content";
     content.textContent = post.content;
+    body.append(content);
 
-    body.append(meta, content);
     item.append(node, body);
     return item;
   }
