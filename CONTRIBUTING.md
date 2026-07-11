@@ -45,8 +45,8 @@ Keep PRs small and focused — one feature/fix per PR.
 
 - **Content goes in `app/data.py`, not in templates.** If you're editing a
   `.html` file to change words, it probably belongs in `data.py`.
-- **Keep the ops-console aesthetic** — terminal-dark, JetBrains Mono for data,
-  the one operational-green accent. New colours/fonts should be a deliberate,
-  discussed change, not a one-off.
+- **Keep the ops-console aesthetic** — white canvas, Inter, the one deep-blue
+  accent (see `app/static/styles/main.css` for the actual tokens). New
+  colours/fonts should be a deliberate, discussed change, not a one-off.
 - **Don't commit secrets.** `.env` is gitignored; use it for anything sensitive.
 - Run the app locally before opening a PR — `/` should load without errors.

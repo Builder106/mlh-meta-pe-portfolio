@@ -3,7 +3,7 @@
 {% block content %}
 <section class="section section--first" id="timeline">
   <h2>Timeline</h2>
-  <p class="lead" style="margin-bottom:22px">Post a school or career update — it shows up below, newest first.</p>
+  <p class="lead" style="margin-bottom:22px">Post a school or career update — it shows up below, grouped by month, newest first.</p>
 
   <form id="timeline-form" class="timeline-form" novalidate>
     <div class="field-row">
@@ -16,6 +16,10 @@
         <input type="email" name="email" autocomplete="email" required maxlength="160" placeholder="ada@example.com">
       </label>
     </div>
+    <label class="field field-date">
+      <span>Date (optional — defaults to today)</span>
+      <input type="date" name="event_date" max="{{ now.strftime('%Y-%m-%d') }}">
+    </label>
     <label class="field">
       <span>Update</span>
       <textarea name="content" required maxlength="2000" rows="3" placeholder="Just shipped a new feature..."></textarea>
@@ -26,22 +30,29 @@
     </div>
   </form>
 
-  <ul id="timeline-list" class="timeline-list">
-    {% for post in posts %}
-    <li class="timeline-post" data-post-id="{{ post.id }}">
-      <img class="timeline-avatar" src="{{ gravatar_url(post.email) }}" alt="" width="40" height="40" loading="lazy">
-      <div class="timeline-body">
-        <div class="timeline-meta">
-          <span class="timeline-name">{{ post.name }}</span>
-          <span class="item-date">{{ post.created_at.strftime("%Y-%m-%d %H:%M UTC") }}</span>
-        </div>
-        <p class="timeline-content">{{ post.content }}</p>
-      </div>
-    </li>
+  <div id="timeline-list" class="timeline-rail">
+    {% for group in groups %}
+    <div class="timeline-group">
+      <h3 class="timeline-month">{{ group.label }}</h3>
+      <ul class="timeline-group-list">
+        {% for post in group.posts %}
+        <li class="timeline-post" data-post-id="{{ post.id }}">
+          <span class="timeline-node{{ ' is-latest' if post.is_latest }}" aria-hidden="true"></span>
+          <div class="timeline-body">
+            <div class="timeline-meta">
+              <span class="timeline-date">{{ post.day_label }}</span>
+              <span class="timeline-name">{{ post.name }}</span>
+            </div>
+            <p class="timeline-content">{{ post.content }}</p>
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
     {% else %}
-    <li class="note" id="timeline-empty">No updates yet — be the first to post one.</li>
+    <p class="note" id="timeline-empty">No updates yet — be the first to post one.</p>
     {% endfor %}
-  </ul>
+  </div>
 </section>
 {% endblock %}
 
@@ -51,24 +62,26 @@
   const timelineList = document.getElementById("timeline-list");
   const timelineError = document.getElementById("timeline-error");
 
-  function formatTimestamp(value) {
-    const parsed = new Date(value);
-    if (Number.isNaN(parsed.getTime())) return value;
-    return parsed.toISOString().slice(0, 16).replace("T", " ") + " UTC";
+  function displayDate(post) {
+    return post.event_date ? new Date(post.event_date + "T00:00:00Z") : new Date(post.created_at);
   }
 
-  function renderPost(post) {
+  function monthLabel(d) {
+    return d.toLocaleString("en-US", { month: "long", year: "numeric", timeZone: "UTC" });
+  }
+
+  function dayLabel(d) {
+    return d.toLocaleString("en-US", { month: "short", day: "2-digit", timeZone: "UTC" });
+  }
+
+  function renderPost(post, d) {
     const item = document.createElement("li");
     item.className = "timeline-post";
     item.dataset.postId = post.id;
 
-    const avatar = document.createElement("img");
-    avatar.className = "timeline-avatar";
-    avatar.src = post.gravatar;
-    avatar.alt = "";
-    avatar.width = 40;
-    avatar.height = 40;
-    avatar.loading = "lazy";
+    const node = document.createElement("span");
+    node.className = "timeline-node is-latest";
+    node.setAttribute("aria-hidden", "true");
 
     const body = document.createElement("div");
     body.className = "timeline-body";
@@ -76,22 +89,22 @@
     const meta = document.createElement("div");
     meta.className = "timeline-meta";
 
+    const date = document.createElement("span");
+    date.className = "timeline-date";
+    date.textContent = dayLabel(d);
+
     const name = document.createElement("span");
     name.className = "timeline-name";
     name.textContent = post.name;
 
-    const date = document.createElement("span");
-    date.className = "item-date";
-    date.textContent = formatTimestamp(post.created_at);
-
-    meta.append(name, date);
+    meta.append(date, name);
 
     const content = document.createElement("p");
     content.className = "timeline-content";
     content.textContent = post.content;
 
     body.append(meta, content);
-    item.append(avatar, body);
+    item.append(node, body);
     return item;
   }
 
@@ -109,7 +122,7 @@
         body: JSON.stringify(payload),
       });
     } catch {
-      timelineError.textContent = "Couldn't reach the server — try again.";
+      timelineError.textContent = "Couldn't reach the server, try again.";
       timelineError.hidden = false;
       return;
     }
@@ -117,13 +130,42 @@
     const data = await response.json().catch(() => ({}));
 
     if (!response.ok) {
-      timelineError.textContent = data.error || "Couldn't post that update — try again.";
+      timelineError.textContent = data.error || "Couldn't post that update, try again.";
       timelineError.hidden = false;
       return;
     }
 
     document.getElementById("timeline-empty")?.remove();
-    timelineList.prepend(renderPost(data));
+    timelineList.querySelectorAll(".timeline-node.is-latest").forEach((n) => n.classList.remove("is-latest"));
+
+    const d = displayDate(data);
+    const label = monthLabel(d);
+    const firstGroup = timelineList.querySelector(".timeline-group");
+    const firstHeading = firstGroup?.querySelector(".timeline-month");
+
+    if (!firstGroup) {
+      // Empty state: this post becomes the only group.
+      const group = document.createElement("div");
+      group.className = "timeline-group";
+      const heading = document.createElement("h3");
+      heading.className = "timeline-month";
+      heading.textContent = label;
+      const list = document.createElement("ul");
+      list.className = "timeline-group-list";
+      list.appendChild(renderPost(data, d));
+      group.append(heading, list);
+      timelineList.append(group);
+    } else if (firstHeading.textContent === label) {
+      // Same month as the newest group: prepend in place, no reshuffling needed.
+      firstGroup.querySelector(".timeline-group-list").prepend(renderPost(data, d));
+    } else {
+      // A different month. Whether that's a new "latest" month or a
+      // backdated post belongs somewhere in the middle, only the server's
+      // sort order can say for sure, so just re-render from the source of truth.
+      window.location.reload();
+      return;
+    }
+
     timelineForm.reset();
   });
 </script>
