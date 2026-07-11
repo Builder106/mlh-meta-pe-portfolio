@@ -42,3 +42,24 @@ def test_timeline_post_create_and_list():
 def test_timeline_post_requires_fields():
     resp = client().post("/api/timeline_post", json={"name": "Missing Fields"})
     assert resp.status_code == 400
+
+
+def test_timeline_post_with_event_date():
+    c = client()
+    created = c.post("/api/timeline_post", json={
+        "name": "CI Runner", "email": "ci@example.com",
+        "content": "backfilled update", "event_date": "2024-12-13",
+    })
+    assert created.status_code == 201, created.get_data(as_text=True)
+    body = created.get_json()
+    assert body["event_date"] == "2024-12-13"
+
+    c.delete(f"/api/timeline_post/{body['id']}")
+
+
+def test_timeline_post_rejects_malformed_event_date():
+    resp = client().post("/api/timeline_post", json={
+        "name": "CI Runner", "email": "ci@example.com",
+        "content": "bad date", "event_date": "not-a-date",
+    })
+    assert resp.status_code == 400

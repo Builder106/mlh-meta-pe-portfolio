@@ -5,14 +5,15 @@ header, ``whoami``, ``deploy.log``, build provenance, edge network — and
 ``/ps_aux`` is the background-process (hobbies) view. All content comes from
 ``app.data.PROFILE`` so templates stay logic-light.
 """
-import hashlib
+import itertools
 import os
 from datetime import datetime, timezone
 
 from dotenv import load_dotenv
 from flask import Flask, render_template, request, url_for, jsonify
 
-from peewee import CharField, DateTimeField, Model, MySQLDatabase, TextField
+from peewee import CharField, DateField, DateTimeField, Model, MySQLDatabase, TextField, fn
+from playhouse.migrate import MySQLMigrator, migrate
 from playhouse.shortcuts import model_to_dict
 
 from . import data
@@ -31,11 +32,17 @@ db = MySQLDatabase(
 
 
 class TimelinePost(Model):
-    """A post on the public timeline — school + career updates."""
+    """A post on the public timeline — school + career updates.
+
+    ``event_date`` is when the update actually happened, distinct from
+    ``created_at`` (when the row was inserted) — the two diverge whenever a
+    post is backfilled instead of written the day of.
+    """
 
     name = CharField()
     email = CharField()
     content = TextField()
+    event_date = DateField(null=True)
     created_at = DateTimeField(default=lambda: datetime.now(timezone.utc))
 
     class Meta:
@@ -44,6 +51,10 @@ class TimelinePost(Model):
 
 db.connect()
 db.create_tables([TimelinePost])
+existing_columns = {c.name for c in db.get_columns(TimelinePost._meta.table_name)}
+if "event_date" not in existing_columns:
+    migrate(MySQLMigrator(db).add_column(
+        TimelinePost._meta.table_name, "event_date", TimelinePost.event_date))
 db.close()
 
 
@@ -58,20 +69,16 @@ def _db_close(exc):
         db.close()
 
 
-def gravatar_url(email, size=64):
-    """Gravatar's hash-of-email avatar convention; `d=identicon` covers posters
-    without a registered Gravatar."""
-    digest = hashlib.md5(email.strip().lower().encode("utf-8")).hexdigest()
-    return f"https://www.gravatar.com/avatar/{digest}?s={size}&d=identicon"
-
-
-app.jinja_env.globals["gravatar_url"] = gravatar_url
-
-
 def serialize_post(post):
     payload = model_to_dict(post)
-    payload["gravatar"] = gravatar_url(post.email)
+    payload["event_date"] = post.event_date.isoformat() if post.event_date else None
     return payload
+
+
+def display_date(post):
+    """The date a post is grouped/labeled by: the real event date if given,
+    otherwise the day it was posted."""
+    return post.event_date or post.created_at.date()
 
 
 @app.context_processor
@@ -102,11 +109,24 @@ def hobbies():
                            procs=data.PROFILE["hobbies"])
 
 
+def _ordered_posts():
+    """Posts ordered by their real-world date (event_date, falling back to the
+    day they were posted), newest first."""
+    order = fn.COALESCE(TimelinePost.event_date, fn.DATE(TimelinePost.created_at))
+    return list(TimelinePost.select().order_by(order.desc(), TimelinePost.created_at.desc()))
+
+
 @app.route("/timeline")
 def timeline():
-    posts = TimelinePost.select().order_by(TimelinePost.created_at.desc())
+    posts = _ordered_posts()
+    for i, post in enumerate(posts):
+        post.month_label = display_date(post).strftime("%B %Y")
+        post.day_label = display_date(post).strftime("%b %d")
+        post.is_latest = i == 0
+    groups = [{"label": label, "posts": list(group)}
+              for label, group in itertools.groupby(posts, key=lambda p: p.month_label)]
     return render_template("timeline.html",
-                           title=f"Timeline — {data.PROFILE['name']}", posts=posts)
+                           title=f"Timeline — {data.PROFILE['name']}", groups=groups)
 
 
 @app.route("/api/timeline_post", methods=["POST"])
@@ -115,16 +135,22 @@ def create_timeline_post():
     name = (payload.get("name") or "").strip()
     email = (payload.get("email") or "").strip()
     content = (payload.get("content") or "").strip()
+    event_date_raw = (payload.get("event_date") or "").strip()
     if not name or not email or not content:
         return jsonify(error="name, email, and content are all required"), 400
-    post = TimelinePost.create(name=name, email=email, content=content)
+    event_date = None
+    if event_date_raw:
+        try:
+            event_date = datetime.strptime(event_date_raw, "%Y-%m-%d").date()
+        except ValueError:
+            return jsonify(error="event_date must be YYYY-MM-DD"), 400
+    post = TimelinePost.create(name=name, email=email, content=content, event_date=event_date)
     return jsonify(serialize_post(post)), 201
 
 
 @app.route("/api/timeline_post", methods=["GET"])
 def list_timeline_posts():
-    posts = TimelinePost.select().order_by(TimelinePost.created_at.desc())
-    return jsonify([serialize_post(p) for p in posts])
+    return jsonify([serialize_post(p) for p in _ordered_posts()])
 
 
 @app.route("/api/timeline_post/<int:post_id>", methods=["DELETE"])
