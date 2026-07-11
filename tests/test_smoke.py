@@ -63,3 +63,24 @@ def test_timeline_post_rejects_malformed_event_date():
         "content": "bad date", "event_date": "not-a-date",
     })
     assert resp.status_code == 400
+
+
+def test_timeline_post_with_image():
+    c = client()
+    created = c.post("/api/timeline_post", json={
+        "name": "CI Runner", "email": "ci@example.com",
+        "content": "with an image", "image": "https://example.com/shot.png",
+    })
+    assert created.status_code == 201, created.get_data(as_text=True)
+    body = created.get_json()
+    assert body["image"] == "https://example.com/shot.png"
+
+    c.delete(f"/api/timeline_post/{body['id']}")
+
+
+def test_timeline_post_rejects_non_url_image():
+    resp = client().post("/api/timeline_post", json={
+        "name": "CI Runner", "email": "ci@example.com",
+        "content": "bad image", "image": "javascript:alert(1)",
+    })
+    assert resp.status_code == 400
