@@ -32,13 +32,12 @@
 </article>
 {% endmacro %}
 
-{# One hobby card. `owner_handle` is set only on the fleet-wide page. #}
+{# One hobby card. #}
 {% macro hobby_card(h) %}
 <article class="hobby">
   <img class="hobby-img" src="{{ url_for('static', filename=h.image) }}"
        alt="{{ h.title }}" loading="lazy" width="640" height="480">
   <div class="hobby-body">
-    {% if h.owner_handle %}<a class="hobby-owner" href="{{ url_for('member', handle=h.owner_handle) }}">{{ h.owner }}</a>{% endif %}
     <h3>{{ h.title }}</h3>
     <p>{{ h.summary }}</p>
   </div>

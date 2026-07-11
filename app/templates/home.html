@@ -8,62 +8,60 @@
 
 {% block content %}
 
-<a class="crumb" href="{{ url_for('fleet') }}">← {{ pod.name }} team</a>
-
 <section class="hero">
-  <img class="hero-photo" src="{{ url_for('static', filename=member.avatar) }}"
-       alt="Photo of {{ member.name }}" width="108" height="108">
+  <img class="hero-photo" src="{{ url_for('static', filename=profile.avatar) }}"
+       alt="Photo of {{ profile.name }}" width="108" height="108">
   <div>
-    <h1>{{ member.name }}</h1>
-    <div class="role">{{ member.role }}</div>
-    <p class="bio">{{ member.tagline }}</p>
-    {% if member.links %}
+    <h1>{{ profile.name }}</h1>
+    <div class="role">{{ profile.role }}</div>
+    <p class="bio">{{ profile.tagline }}</p>
+    {% if profile.links %}
     <div class="hero-links">
-      {% if member.links.site %}<a href="{{ member.links.site }}" target="_blank" rel="noopener">Website</a>{% endif %}
-      {% if member.links.github %}<a href="{{ member.links.github }}" target="_blank" rel="noopener">GitHub</a>{% endif %}
-      {% if member.links.email %}<a href="{{ member.links.email }}">Email</a>{% endif %}
+      {% if profile.links.site %}<a href="{{ profile.links.site }}" target="_blank" rel="noopener">Website</a>{% endif %}
+      {% if profile.links.github %}<a href="{{ profile.links.github }}" target="_blank" rel="noopener">GitHub</a>{% endif %}
+      {% if profile.links.email %}<a href="{{ profile.links.email }}">Email</a>{% endif %}
     </div>
     {% endif %}
   </div>
 </section>
 
-{% if member.about %}
+{% if profile.about %}
 <section class="section section--first" id="about">
   <h2>About</h2>
-  <div class="prose">{% for para in member.about %}<p>{{ para }}</p>{% endfor %}</div>
+  <div class="prose">{% for para in profile.about %}<p>{{ para }}</p>{% endfor %}</div>
 </section>
 {% endif %}
 
-{% if member.experience %}
+{% if profile.experience %}
 <section class="section" id="experience">
   <h2>Experience &amp; projects</h2>
-  {% for item in member.experience %}{{ ui.experience_item(item) }}{% endfor %}
+  {% for item in profile.experience %}{{ ui.experience_item(item) }}{% endfor %}
 </section>
 {% endif %}
 
-{% if member.education %}
+{% if profile.education %}
 <section class="section" id="education">
   <h2>Education</h2>
-  {% for edu in member.education %}{{ ui.education_item(edu) }}{% endfor %}
+  {% for edu in profile.education %}{{ ui.education_item(edu) }}{% endfor %}
 </section>
 {% endif %}
 
-{% if member.places %}
+{% if profile.places %}
 <section class="section" id="travel">
   <h2>Places I've been</h2>
-  <p class="map-note">{{ member.places | length }} place{{ 's' if member.places | length != 1 }} on the map.</p>
-  <div id="map" role="img" aria-label="Map of places {{ member.name }} has visited"></div>
+  <p class="map-note">{{ profile.places | length }} place{{ 's' if profile.places | length != 1 }} on the map.</p>
+  <div id="map" role="img" aria-label="Map of places {{ profile.name }} has visited"></div>
 </section>
 {% endif %}
 
 {% endblock %}
 
 {% block scripts %}
-{% if member.places %}
+{% if profile.places %}
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script>
-  const PLACES = {{ member.places | tojson }};
+  const PLACES = {{ profile.places | tojson }};
   const map = L.map('map', { scrollWheelZoom: false, attributionControl: true, worldCopyJump: true })
                 .setView([24, -20], 2);
   L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {

@@ -1,6 +1,21 @@
-# JOURNAL — 26.SUM.B.6 pod portfolio
+# JOURNAL — Olayinka Vaughan's portfolio
 
 > Dated log of decisions and notes. Reverse-chronological; one paragraph max.
+
+## 2026-07-11 — Corrected the team/fleet framing — this is an individual portfolio #decision
+
+Every fellow does their own portfolio; there's no pod-shared repo. The
+06-17 decision to build this as a multi-teammate "fleet" (`MEMBERS` list,
+`/u/<handle>` per-person routing, a CONTRIBUTING guide centered on "add
+yourself to the fleet" and teammate PR review) was wrong from the start —
+built on an assumption that was never checked against how the fellowship
+actually runs. Collapsed `MEMBERS` down to a single `PROFILE` dict, `/` now
+renders the profile directly instead of a list-of-one, dropped the `/u/<handle>`
+route and the `member`/`fleet` template pair (merged into `home.html`), and
+rewrote `README.md`/`CONTRIBUTING.md` to describe a solo repo. Kept the
+ops-console visual metaphor (`deploy.log`, `whoami`, `ps_aux`, edge network)
+since that part was never actually about having teammates — it just made
+personal experience/education/hobbies read as systems primitives.
 
 ## 2026-07-11 — Connection-per-request instead of connect-once-at-boot #incident
 
