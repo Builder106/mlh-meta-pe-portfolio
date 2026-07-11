@@ -4,9 +4,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="{{ pod.label }} — {{ pod.tagline }}">
-  <meta property="og:title" content="{{ pod.name }} — {{ pod.label }}">
-  <meta property="og:description" content="{{ pod.tagline }}">
+  <meta name="description" content="{{ profile.label }} — {{ profile.tagline }}">
+  <meta property="og:title" content="{{ profile.name }} — {{ profile.label }}">
+  <meta property="og:description" content="{{ profile.tagline }}">
   <meta property="og:type" content="website">
   <meta property="og:url" content="{{ site_url }}">
   <meta name="theme-color" content="#ffffff">
@@ -31,15 +31,13 @@
       <a href="https://fellowship.mlh.io" target="_blank" rel="noopener" aria-label="MLH Fellowship">
         <img src="{{ url_for('static', filename='img/mlh-logo.svg') }}" alt="MLH Fellowship" height="22">
       </a>
-      <span class="ribbon-label">Production Engineering · {{ pod.cohort }}</span>
+      <span class="ribbon-label">Production Engineering · {{ profile.cohort }}</span>
     </div>
   </div>
 
   <header class="nav">
     <div class="nav-inner">
-      <a class="nav-brand" href="{{ url_for('fleet') }}">{{ pod.name }}</a>
-      <!-- Dynamic nav: built in app/__init__.py from MEMBERS. Add a member and a
-           tab (their first name) + a page appear automatically. -->
+      <a class="nav-brand" href="{{ url_for('home') }}">{{ profile.name }}</a>
       <nav class="nav-links" aria-label="Primary">
         {% for item in nav %}
         <a class="{{ 'active' if item.active }}" href="{{ item.url }}"
@@ -55,9 +53,9 @@
 
   <footer class="footer">
     <div class="footer-inner">
-      <span>{{ pod.name }} · MLH × Meta Production Engineering</span>
+      <span>{{ profile.name }} · MLH × Meta Production Engineering</span>
       <span>Auto-redeployed via redeploy-site.sh</span>
-      <span><a href="{{ pod.repo }}" target="_blank" rel="noopener">Source on GitHub</a></span>
+      <span><a href="{{ profile.repo }}" target="_blank" rel="noopener">Source on GitHub</a></span>
     </div>
   </footer>
 

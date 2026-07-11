@@ -1,6 +1,6 @@
-# `26.SUM.B.6` — a pod, rendered as a fleet
+# Olayinka Vaughan — portfolio, rendered as an ops console
 
-> A team portfolio for our MLH × Meta Production Engineering pod.
+> An individual portfolio for the MLH × Meta Production Engineering fellowship.
 > Built with Flask + Jinja for Week 1 of the fellowship.
 
 [![CI](https://github.com/Builder106/MLH-Meta-PE-Portfolio/actions/workflows/ci.yml/badge.svg)](https://github.com/Builder106/MLH-Meta-PE-Portfolio/actions/workflows/ci.yml)
@@ -12,24 +12,23 @@
 ## The idea
 
 Week 1's rubric is a list of generic portfolio tasks (about, work, education,
-hobbies, a travel map).
+hobbies, a travel map). This site renders each one as a systems primitive
+instead of a plain page section:
 
-- **`/`** — the **overview**: every teammate listed
-- **`/u/<handle>`** — a member's detail page, where the rubric rows become
-  systems primitives:
+| Rubric task | Rendered as |
+| --- | --- |
+| Hero + photo | **Status header** — avatar, role / region, live clock |
+| About | **`whoami`** — a terminal block / service description |
+| Work experience | **`deploy.log`** — each role & project as a deployment |
+| Education | **build provenance** — where the build was compiled from |
+| Travel map | **edge network** — visited cities as Points of Presence |
 
-  | Rubric task | Rendered as |
-  | --- | --- |
-  | Hero + photo | **Status header** — avatar, role / region, live clock |
-  | About | **`whoami`** — a terminal block / service description |
-  | Work experience | **`deploy.log`** — each role & project as a deployment |
-  | Education | **build provenance** — where the build was compiled from |
-  | Travel map | **edge network** — visited cities as Points of Presence |
+- **`/`** — the profile itself: status header, `whoami`, `deploy.log`, build
+  provenance, edge network.
+- **`/ps_aux`** — hobbies, rendered as background processes.
 
-- **`/ps_aux`** — everyone's hobbies as
-  running processes, tagged by owner.
-
-The menu bar and every member page are generated from one `MEMBERS` list, so adding a teammate is a data edit, not a template change.
+Everything the templates render lives in one `PROFILE` dict, so content edits
+never need a template change.
 
 ## Quickstart
 
@@ -41,7 +40,7 @@ flask run
 ```
 
 Open <http://127.0.0.1:5000>. There's also a `/healthz` liveness probe that
-returns the pod's status as JSON, because of course a fleet has one.
+returns the service's status as JSON, because of course a service has one.
 
 > The 2021-era template pinned Flask 2.0.1, which won't build on Python 3.12+.
 > Dependencies were modernized to Flask 3.1 (tested on Python 3.14).
@@ -50,46 +49,44 @@ returns the pod's status as JSON, because of course a fleet has one.
 
 ```mermaid
 flowchart LR
-    A[data.py<br/>POD + MEMBERS] --> B[Flask routes<br/>app/__init__.py]
+    A[data.py<br/>PROFILE] --> B[Flask routes<br/>app/__init__.py]
     B --> C[Jinja templates<br/>base + macros]
     C --> D[(rendered HTML)]
-    B -. nav built from MEMBERS .-> C
     C -. Leaflet + CARTO tiles .-> D
 ```
 
-- **`app/data.py`** holds `POD` plus a `MEMBERS` list. Each member is a dict with
-  their about / experience / education / hobbies / places.
-- **Routes** (`app/__init__.py`): `/` (fleet), `/u/<handle>` (member),
-  `/ps_aux` (fleet hobbies), `/healthz`. The nav is built from `MEMBERS`.
-- **`app/templates/macros.html`** holds reusable macros (`deploy_row`,
-  `provenance_card`, `process_card`); pages just loop over the data.
+- **`app/data.py`** holds `PROFILE` — a single dict with about / experience /
+  education / hobbies / places.
+- **Routes** (`app/__init__.py`): `/` (home), `/ps_aux` (hobbies), `/timeline`,
+  `/healthz`.
+- **`app/templates/macros.html`** holds reusable macros (`experience_item`,
+  `education_item`, `hobby_card`); pages just loop over the data.
 
 ## Project structure
 
 ```
 app/
-├── __init__.py          # Flask app, routes, MEMBERS-driven nav, 404 handler
-├── data.py              # ← POD + MEMBERS (all content lives here)
+├── __init__.py          # Flask app, routes, 404 handler
+├── data.py              # ← PROFILE (all content lives here)
 ├── static/
 │   ├── img/             # site chrome: favicon, Apple icon, MLH logo
-│   ├── photos/          # member avatars + hobby photos (your content)
+│   ├── photos/          # avatar + hobby photos (your content)
 │   └── styles/main.css  # the design system
 └── templates/
-    ├── base.html        # layout: dynamic nav + footer status bar
+    ├── base.html        # layout: nav + footer status bar
     ├── macros.html      # reusable Jinja macros for repeating sections
-    ├── fleet.html       # / — the fleet overview
-    ├── member.html      # /u/<handle> — a member's detail page
-    ├── hobbies.html     # /ps_aux — fleet-wide background processes
-    └── 404.html         # no-such-service page
+    ├── home.html        # / — the profile
+    ├── hobbies.html     # /ps_aux — background processes
+    ├── timeline.html     # /timeline — school + career updates
+    └── 404.html         # not-found page
 ```
 
-## Adding yourself / contributing
+## Contributing
 
-This is a team repo — see **[CONTRIBUTING.md](CONTRIBUTING.md)**. The short
-version: copy `MEMBER_TEMPLATE` in [`app/data.py`](app/data.py) into `MEMBERS`,
-drop a square photo at `app/static/photos/<your-handle>.jpg`, and open a PR. You'll
-get your own page and a nav tab automatically.
+See **[CONTRIBUTING.md](CONTRIBUTING.md)** for dev setup and how content is
+wired — useful if you're adapting this template for your own fellowship
+portfolio.
 
 ## License
 
-[MIT](LICENSE) © the 26.SUM.B.6 pod
+[MIT](LICENSE) © Olayinka Vaughan
