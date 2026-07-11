@@ -2,6 +2,20 @@
 
 > Dated log of decisions and notes. Reverse-chronological; one paragraph max.
 
+## 2026-07-11 — Connection-per-request instead of connect-once-at-boot #incident
+
+Caught before it bit anyone in production, but worth writing down: the
+timeline feature originally opened one MySQL connection at import time and
+kept it for the process's whole life. MySQL's `wait_timeout` closes idle
+connections after 8 hours by default, and peewee doesn't notice server-side
+closes, so the first `/timeline` or `/api/timeline_post` request after any
+quiet stretch that long would have thrown `OperationalError: MySQL server
+has gone away`, and kept failing on every request after that until the
+process restarted. Gunicorn's `Restart=always` would not have helped, since
+the process itself never crashes. Switched to peewee's own recommended
+Flask pattern instead: connect in `before_request`, close in
+`teardown_request`.
+
 ## 2026-07-11 — Timeline deployed to the VPS #milestone
 
 Installed `mysql-server` 8.0 on the CentOS Stream 9 box (the AppStream module
