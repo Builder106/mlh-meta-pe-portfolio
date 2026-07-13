@@ -30,6 +30,20 @@ instead of a plain page section:
 Everything the templates render lives in one `PROFILE` dict, so content edits
 never need a template change.
 
+## Preview
+
+**`/`** — status header, `whoami`, `deploy.log`, build provenance, edge network:
+
+<img src="app/static/img/screenshots/home-hero.png" width="800" alt="Home page: status header, whoami, and deploy log entries">
+
+**`/timeline`** — MySQL-backed public updates, grouped by month:
+
+<img src="app/static/img/screenshots/timeline-full.png" width="800" alt="Timeline page: post form plus dated entries with screenshots">
+
+**`/ps_aux`** — hobbies rendered as background processes:
+
+<img src="app/static/img/screenshots/hobbies.png" width="800" alt="Hobbies page: piano and basketball as background processes">
+
 ## Quickstart
 
 ```bash
@@ -70,7 +84,9 @@ app/
 ├── data.py              # ← PROFILE (all content lives here)
 ├── static/
 │   ├── img/             # site chrome: favicon, Apple icon, MLH logo
+│   │   └── screenshots/ # README preview images
 │   ├── photos/          # avatar + hobby photos (your content)
+│   ├── timeline/        # images attached to /timeline posts
 │   └── styles/main.css  # the design system
 └── templates/
     ├── base.html        # layout: nav + footer status bar
