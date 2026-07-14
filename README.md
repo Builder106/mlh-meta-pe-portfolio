@@ -1,4 +1,4 @@
-# Olayinka Vaughan — portfolio, rendered as an ops console
+# Olayinka Vaughan — portfolio
 
 > An individual portfolio for the MLH × Meta Production Engineering fellowship.
 > Built with Flask + Jinja for Week 1 of the fellowship.
@@ -11,7 +11,7 @@
 
 ## The idea
 
-Week 1's rubric is a list of generic portfolio tasks (about, work, education,
+Week 1's tasks are a list of generic portfolio items (about, work, education,
 hobbies, a travel map). This site renders each one as a systems primitive
 instead of a plain page section:
 
