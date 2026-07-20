@@ -8,7 +8,7 @@ cd "$PROJECT_DIR"
 git fetch
 git reset origin/main --hard
 
-echo "Stopping containers (avoids OOM on this box while the next build runs)..."
+echo "Stopping containers (avoids Out-of-Memory on this box while the next build runs)..."
 docker compose -f docker-compose.prod.yml down
 
 echo "Rebuilding and starting containers..."
