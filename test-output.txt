@@ -1,0 +1,8 @@
+............................                                             [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.14/site-packages/peewee.py:465
+  /Users/yinkavaughan/My Drive (yvaughan@wesleyan.edu)/MLH/meta-pe-fellowship/mlh-meta-pe-portfolio/.venv/lib/python3.14/site-packages/peewee.py:465: PytestCollectionWarning: cannot collect 'test_db' because it is not a function.
+    def __call__(self, fn):
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+28 passed, 1 warning in 1.66s

@@ -3,3 +3,4 @@
 # invocation (CI), not just `python -m pytest`.
 pythonpath = ["."]
 testpaths = ["tests"]
+filterwarnings = ["ignore::pytest.PytestCollectionWarning"]
