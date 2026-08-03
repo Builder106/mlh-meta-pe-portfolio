@@ -1,0 +1,40 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      SSH_IP: ${{ secrets.SSH_IP }}
+      SSH_USER: ${{ secrets.SSH_USER }}
+      PROJECT_ROOT: ${{ secrets.PROJECT_ROOT }}
+    steps:
+      - name: Configure SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/deploy-key.pem
+          chmod 600 ~/.ssh/deploy-key.pem
+          ssh-keyscan -H "$SSH_IP" >> ~/.ssh/known_hosts
+          cat >> ~/.ssh/config << EOF
+          Host my-vps
+            HostName $SSH_IP
+            User $SSH_USER
+            IdentityFile ~/.ssh/deploy-key.pem
+            StrictHostKeyChecking yes
+          EOF
+
+      - name: Deploy site
+        run: ssh my-vps "cd '$PROJECT_ROOT' && ~/redeploy-site.sh"
