@@ -10,3 +10,5 @@ flask.sqlite
 __pycache__/
 *.pyc
 backups/
+
+test-output.txt

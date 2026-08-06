@@ -22,4 +22,7 @@ docker compose -f docker-compose.prod.yml exec -T -e MYSQL_PWD="$MYSQL_ROOT_PASS
 
 echo "Backup written to $BACKUP_DIR/$MYSQL_DATABASE-$TIMESTAMP.sql.gz"
 
+RETENTION_DAYS=14
+find "$BACKUP_DIR" -name "$MYSQL_DATABASE-*.sql.gz" -mtime +$RETENTION_DAYS -delete
+
 curl -fsS -m 10 --retry 3 "$HEALTHCHECKS_URL" >/dev/null 2>&1 || true
