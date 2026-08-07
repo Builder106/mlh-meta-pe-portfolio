@@ -78,14 +78,16 @@ jobs:
           EOF
 
       - name: Deploy site
+        env:
+          PROJECT_ROOT: ${{ secrets.PROJECT_ROOT }}
         run: |
-          ssh my-vps "
-            if [ ! -d '$PROJECT_ROOT/.git' ]; then
-              echo 'Project directory not found, cloning repo...'
-              git clone https://github.com/Builder106/MLH-Meta-PE-Portfolio.git '$PROJECT_ROOT'
+          ssh my-vps '
+            if [ ! -d "$PROJECT_ROOT/.git" ]; then
+              echo "Project directory not found, cloning repo..."
+              git clone https://github.com/Builder106/MLH-Meta-PE-Portfolio.git "$PROJECT_ROOT"
             fi
-            cd '$PROJECT_ROOT' && ./redeploy-site.sh
-          "
+            cd "$PROJECT_ROOT" && ./redeploy-site.sh
+          '
 
       - name: Notify Discord on success
         if: success() && env.DISCORD_WEBHOOK != ''
