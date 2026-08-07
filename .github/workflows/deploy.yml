@@ -82,11 +82,16 @@ jobs:
           PROJECT_ROOT: ${{ secrets.PROJECT_ROOT }}
         run: |
           ssh my-vps "PROJECT_ROOT='$PROJECT_ROOT' bash -c '
-            if [ ! -d \"\$PROJECT_ROOT/.git\" ]; then
+            set -e
+            mkdir -p \"$(dirname \"$PROJECT_ROOT\")\"
+            if [ ! -d \"$PROJECT_ROOT/.git\" ]; then
               echo \"Project directory not found, cloning repo...\"
-              git clone https://github.com/Builder106/MLH-Meta-PE-Portfolio.git \"\$PROJECT_ROOT\"
+              git clone https://github.com/Builder106/MLH-Meta-PE-Portfolio.git \"$PROJECT_ROOT\"
+            else
+              echo \"Project directory exists, pulling latest...\"
+              cd \"$PROJECT_ROOT\" && git fetch && git reset origin/main --hard
             fi
-            cd \"\$PROJECT_ROOT\" && ./redeploy-site.sh
+            cd \"$PROJECT_ROOT\" && ./redeploy-site.sh
           '"
 
       - name: Notify Discord on success
