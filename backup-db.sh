@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-PROJECT_DIR="$HOME/MLH-Meta-PE-Portfolio"
+PROJECT_DIR="$HOME/CS/projects/swe/mlh-meta-pe-portfolio"
 BACKUP_DIR="$PROJECT_DIR/backups"
 TIMESTAMP=$(date +%Y%m%d-%H%M%S)
 
@@ -16,8 +16,8 @@ trap report_failure ERR
 mkdir -p "$BACKUP_DIR"
 
 echo "Dumping $MYSQL_DATABASE..."
-docker compose -f docker-compose.prod.yml exec -T -e MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysql \
-  mariadb-dump -u root "$MYSQL_DATABASE" \
+docker-compose -f docker-compose.prod.yml exec -T -e MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysql \
+  mariadb-dump -h mysql -P 3306 -u root "$MYSQL_DATABASE" \
   | gzip > "$BACKUP_DIR/$MYSQL_DATABASE-$TIMESTAMP.sql.gz"
 
 echo "Backup written to $BACKUP_DIR/$MYSQL_DATABASE-$TIMESTAMP.sql.gz"
