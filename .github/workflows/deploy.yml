@@ -81,18 +81,18 @@ jobs:
         env:
           PROJECT_ROOT: ${{ secrets.PROJECT_ROOT }}
         run: |
-          ssh my-vps "PROJECT_ROOT='$PROJECT_ROOT' bash -c '
+          ssh my-vps "PROJECT_ROOT='$PROJECT_ROOT' bash -s" << 'REMOTE_SCRIPT'
             set -e
-            mkdir -p \"$(dirname \"$PROJECT_ROOT\")\"
-            if [ ! -d \"$PROJECT_ROOT/.git\" ]; then
-              echo \"Project directory not found, cloning repo...\"
-              git clone https://github.com/Builder106/MLH-Meta-PE-Portfolio.git \"$PROJECT_ROOT\"
+            mkdir -p "$(dirname "$PROJECT_ROOT")"
+            if [ ! -d "$PROJECT_ROOT/.git" ]; then
+              echo "Project directory not found, cloning repo..."
+              git clone https://github.com/Builder106/MLH-Meta-PE-Portfolio.git "$PROJECT_ROOT"
             else
-              echo \"Project directory exists, pulling latest...\"
-              cd \"$PROJECT_ROOT\" && git fetch && git reset origin/main --hard
+              echo "Project directory exists, pulling latest..."
+              cd "$PROJECT_ROOT" && git fetch && git reset origin/main --hard
             fi
-            cd \"$PROJECT_ROOT\" && ./redeploy-site.sh
-          '"
+            cd "$PROJECT_ROOT" && ./redeploy-site.sh
+          REMOTE_SCRIPT
 
       - name: Notify Discord on success
         if: success() && env.DISCORD_WEBHOOK != ''
