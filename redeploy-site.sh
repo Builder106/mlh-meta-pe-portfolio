@@ -1,7 +1,8 @@
 #!/bin/bash
 set -e
 
-PROJECT_DIR="$HOME/MLH-Meta-PE-Portfolio"
+# Use PROJECT_ROOT from environment if set (from deploy workflow), otherwise default
+PROJECT_DIR="${PROJECT_ROOT:-$HOME/MLH-Meta-PE-Portfolio}"
 
 echo "Pulling latest changes from main..."
 cd "$PROJECT_DIR"
