@@ -80,6 +80,15 @@ jobs:
       - name: Deploy site
         env:
           PROJECT_ROOT: ${{ secrets.PROJECT_ROOT }}
+          URL: ${{ secrets.URL }}
+          MYSQL_HOST: ${{ secrets.MYSQL_HOST }}
+          MYSQL_PORT: ${{ secrets.MYSQL_PORT }}
+          MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
+          MYSQL_USER: ${{ secrets.MYSQL_USER }}
+          MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+          CERTBOT_EMAIL: ${{ secrets.CERTBOT_EMAIL }}
+          HEALTHCHECKS_URL: ${{ secrets.HEALTHCHECKS_URL }}
         run: |
           ssh my-vps "PROJECT_ROOT='$PROJECT_ROOT' bash -s" << 'REMOTE_SCRIPT'
             set -e
@@ -91,6 +100,20 @@ jobs:
               echo "Project directory exists, pulling latest..."
               cd "$PROJECT_ROOT" && git fetch && git reset origin/main --hard
             fi
+
+            # Create .env file from env vars passed by GitHub Actions
+            {
+              echo "URL=$URL"
+              echo "MYSQL_HOST=$MYSQL_HOST"
+              echo "MYSQL_PORT=$MYSQL_PORT"
+              echo "MYSQL_DATABASE=$MYSQL_DATABASE"
+              echo "MYSQL_USER=$MYSQL_USER"
+              echo "MYSQL_PASSWORD=$MYSQL_PASSWORD"
+              echo "MYSQL_ROOT_PASSWORD=$MYSQL_ROOT_PASSWORD"
+              echo "CERTBOT_EMAIL=$CERTBOT_EMAIL"
+              echo "HEALTHCHECKS_URL=$HEALTHCHECKS_URL"
+            } > "$PROJECT_ROOT/.env"
+
             cd "$PROJECT_ROOT" && ./redeploy-site.sh
           REMOTE_SCRIPT
 
