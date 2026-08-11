@@ -214,6 +214,32 @@ def healthz():
     )
 
 
+@app.route("/health")
+def health():
+    """Dependency probe — actually touches the database instead of just
+    reporting that the process is alive, so hitting this endpoint exercises
+    mysql (and, since it is reached through the reverse proxy, nginx too).
+    """
+    checks = {}
+    overall_ok = True
+
+    start = datetime.now(timezone.utc)
+    try:
+        db.connect(reuse_if_open=True)
+        post_count = TimelinePost.select().count()
+        latency_ms = (datetime.now(timezone.utc) - start).total_seconds() * 1000
+        checks["mysql"] = {"ok": True, "latency_ms": round(latency_ms, 2), "row_count": post_count}
+    except Exception as exc:
+        overall_ok = False
+        checks["mysql"] = {"ok": False, "error": str(exc)}
+
+    checks["myportfolio"] = {"ok": True}
+
+    status_code = 200 if overall_ok else 503
+    return jsonify(status="ok" if overall_ok else "degraded", checks=checks,
+                   ts=datetime.now(timezone.utc).isoformat()), status_code
+
+
 @app.errorhandler(404)
 def not_found(_e):
     return render_template("404.html", title="404 — no such service"), 404
