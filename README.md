@@ -24,7 +24,9 @@ instead of a plain page section:
 | Travel map | **edge network** — visited cities as Points of Presence |
 
 - **`/`** — the profile itself: status header, `whoami`, `deploy.log`, build
+
   provenance, edge network.
+
 - **`/ps_aux`** — hobbies, rendered as background processes.
 
 Everything the templates render lives in one `PROFILE` dict, so content edits
@@ -70,10 +72,15 @@ flowchart LR
 ```
 
 - **`app/data.py`** holds `PROFILE` — a single dict with about / experience /
+
   education / hobbies / places.
-- **Routes** (`app/__init__.py`): `/` (home), `/ps_aux` (hobbies), `/timeline`,
+
+- **Routes** (`app/__init__.py`): `/`(home),`/ps_aux`(hobbies),`/timeline`,
+
   `/healthz`.
+
 - **`app/templates/macros.html`** holds reusable macros (`experience_item`,
+
   `education_item`, `hobby_card`); pages just loop over the data.
 
 ## Project structure

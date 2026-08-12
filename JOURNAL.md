@@ -19,10 +19,10 @@ the project's existing naming.
 Week 6 asks for a Dockerfile plus dev/prod `docker-compose.yml` variants:
 `myportfolio` (gunicorn, matching how the VPS already serves it) alongside a
 `mysql`/mariadb service on a named volume, so timeline data survives `compose
-down`. Added a `.dockerignore` too — `.gitignore` only keeps files out of git,
+down`. Added a `.dockerignore`too —`.gitignore` only keeps files out of git,
 not out of the Docker build context, so without it `COPY . .` would have
 baked the local `.env` (real DB credentials) directly into the image layer.
-`requirements.txt` was also missing `gunicorn`: it had been installed ad hoc
+`requirements.txt`was also missing`gunicorn`: it had been installed ad hoc
 into the VPS venv for the systemd deploy back in Week 4 but never pinned,
 which the Dockerfile build would otherwise have failed on.
 
@@ -33,9 +33,9 @@ Every fellow does their own portfolio; there's no pod-shared repo. The
 `/u/<handle>` per-person routing, a CONTRIBUTING guide centered on "add
 yourself to the fleet" and teammate PR review) was wrong from the start —
 built on an assumption that was never checked against how the fellowship
-actually runs. Collapsed `MEMBERS` down to a single `PROFILE` dict, `/` now
+actually runs. Collapsed `MEMBERS`down to a single`PROFILE`dict,`/` now
 renders the profile directly instead of a list-of-one, dropped the `/u/<handle>`
-route and the `member`/`fleet` template pair (merged into `home.html`), and
+route and the `member`/`fleet`template pair (merged into`home.html`), and
 rewrote `README.md`/`CONTRIBUTING.md` to describe a solo repo. Kept the
 ops-console visual metaphor (`deploy.log`, `whoami`, `ps_aux`, edge network)
 since that part was never actually about having teammates — it just made
@@ -47,7 +47,7 @@ Caught before it bit anyone in production, but worth writing down: the
 timeline feature originally opened one MySQL connection at import time and
 kept it for the process's whole life. MySQL's `wait_timeout` closes idle
 connections after 8 hours by default, and peewee doesn't notice server-side
-closes, so the first `/timeline` or `/api/timeline_post` request after any
+closes, so the first `/timeline`or`/api/timeline_post` request after any
 quiet stretch that long would have thrown `OperationalError: MySQL server
 has gone away`, and kept failing on every request after that until the
 process restarted. Gunicorn's `Restart=always` would not have helped, since
@@ -59,7 +59,7 @@ Flask pattern instead: connect in `before_request`, close in
 
 Installed `mysql-server` 8.0 on the CentOS Stream 9 box (the AppStream module
 had it), then ran the equivalent of `mysql_secure_installation` by hand:
-scoped the app's grant to `myportfoliodb.*` instead of the `*.*` the
+scoped the app's grant to `myportfoliodb.*`instead of the`*.*` the
 assignment uses for local dev, dropped any anonymous accounts, and set a
 generated root password instead of leaving root passwordless on a box that's
 open to the internet. `redeploy-site.sh` handled the rest without changes.
