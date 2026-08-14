@@ -1,6 +1,144 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mlh-meta-pe-portfolio"
+version = "0.1.0"
+description = "MLH x Meta Production Engineering Fellowship portfolio"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.12"
+dependencies = [
+    "Flask==3.1.3",
+    "Werkzeug==3.1.8",
+    "Jinja2==3.1.6",
+    "itsdangerous==2.2.0",
+    "click==8.4.1",
+    "MarkupSafe==3.0.3",
+    "blinker==1.9.0",
+    "python-dotenv==1.2.2",
+    "peewee==4.1.2",
+    "PyMySQL==1.2.0",
+    "cryptography==49.0.0",
+    "gunicorn==23.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest==8.3.4",
+    "ruff==0.8.0",
+    "black==24.10.0",
+    "mypy==1.13.0",
+    "types-requests==2.32.0",
+]
+
 [tool.pytest.ini_options]
-# Put the repo root on sys.path so `import app` works under a bare `pytest`
-# invocation (CI), not just `python -m pytest`.
 pythonpath = ["."]
 testpaths = ["tests"]
 filterwarnings = ["ignore::pytest.PytestCollectionWarning"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+indent-width = 4
+indent-style = "space"
+skip-magic-trailing-comma = false
+src = ["."]
+exclude = [
+    ".git",
+    "__pycache__",
+    ".venv",
+    "venv",
+    ".mypy_cache",
+    ".ruff_cache",
+    "dist",
+    "build",
+    "*.egg-info",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "N",   # pep8-naming
+    "UP",  # pyupgrade
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "T20", # flake8-print
+    "PTH", # flake8-use-pathlib
+    "ERA", # eradicate
+    "PL",  # pylint
+    "TRY", # tryceratops
+    "SIM", # flake8-simplify
+    "RUF", # ruff-specific
+    "RET", # flake8-return
+    "ARG", # flake8-unused-arguments
+    "TD",  # flake8-todo
+]
+ignore = [
+    "E501",  # line too long (handled by formatter)
+    "B008",  # function calls in default arguments (sometimes intentional)
+    "PLR0913", # too many arguments (sometimes necessary)
+    "TRY003",  # avoid specifying long messages outside the exception class
+    "TD001",   # TODO comments (allow for now)
+]
+per-file-ignores = {
+    "tests/*" = ["S101", "S106", "S311", "PL012"],  # test-specific allows
+}
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+indent-width = 4
+line-width = 100
+docstring-code-format = true
+docstring-code-line-length = 88
+
+[tool.black]
+line-length = 100
+target-version = ["py312"]
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+  | \.venv
+  | venv
+  | \.mypy_cache
+  | \.ruff_cache
+  | dist
+  | build
+  | \.egg-info
+)/
+'''
+
+[tool.mypy]
+python_version = "3.12"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = false
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+strict_equality = true
+show_error_codes = true
+pretty = true
+
+[[tool.mypy.overrides]]
+module = [
+    "flask*",
+    "werkzeug*",
+    "jinja2*",
+    "peewee*",
+    "pymysql*",
+    "cryptography*",
+    "gunicorn*",
+    "pytest*",
+]
+ignore_missing_imports = true
