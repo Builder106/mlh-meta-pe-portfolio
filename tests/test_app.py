@@ -3,6 +3,7 @@ an isolated in-memory SQLite database (TESTING=true), not the app's own
 MySQL connection.
 """
 import os
+
 os.environ.setdefault("TESTING", "true")
 
 import unittest

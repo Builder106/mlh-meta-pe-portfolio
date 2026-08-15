@@ -8,12 +8,20 @@ header, ``whoami``, ``deploy.log``, build provenance, edge network — and
 import itertools
 import os
 import re
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from dotenv import load_dotenv
-from flask import Flask, render_template, request, url_for, jsonify
-
-from peewee import CharField, DateField, DateTimeField, Model, MySQLDatabase, SqliteDatabase, TextField, fn
+from flask import Flask, jsonify, render_template, request, url_for
+from peewee import (
+    CharField,
+    DateField,
+    DateTimeField,
+    Model,
+    MySQLDatabase,
+    SqliteDatabase,
+    TextField,
+    fn,
+)
 from playhouse.migrate import MySQLMigrator, migrate
 from playhouse.shortcuts import model_to_dict
 
@@ -54,7 +62,7 @@ class TimelinePost(Model):
     content = TextField()
     event_date = DateField(null=True)
     image = CharField(null=True, max_length=500)
-    created_at = DateTimeField(default=lambda: datetime.now(timezone.utc))
+    created_at = DateTimeField(default=lambda: datetime.now(UTC))
 
     class Meta:
         database = db
@@ -117,7 +125,7 @@ def inject_globals():
     return {
         "nav": nav,
         "profile": data.PROFILE,
-        "now": datetime.now(timezone.utc),
+        "now": datetime.now(UTC),
         "site_url": os.getenv("URL", "localhost:5000"),
     }
 
@@ -210,7 +218,7 @@ def healthz():
         region=data.PROFILE["region"],
         cohort=data.PROFILE["cohort"],
         checks={"processes": len(data.PROFILE["hobbies"])},
-        ts=datetime.now(timezone.utc).isoformat(),
+        ts=datetime.now(UTC).isoformat(),
     )
 
 
@@ -223,11 +231,11 @@ def health():
     checks = {}
     overall_ok = True
 
-    start = datetime.now(timezone.utc)
+    start = datetime.now(UTC)
     try:
         db.connect(reuse_if_open=True)
         post_count = TimelinePost.select().count()
-        latency_ms = (datetime.now(timezone.utc) - start).total_seconds() * 1000
+        latency_ms = (datetime.now(UTC) - start).total_seconds() * 1000
         checks["mysql"] = {"ok": True, "latency_ms": round(latency_ms, 2), "row_count": post_count}
     except Exception as exc:
         overall_ok = False
@@ -237,7 +245,7 @@ def health():
 
     status_code = 200 if overall_ok else 503
     return jsonify(status="ok" if overall_ok else "degraded", checks=checks,
-                   ts=datetime.now(timezone.utc).isoformat()), status_code
+                   ts=datetime.now(UTC).isoformat()), status_code
 
 
 @app.errorhandler(404)

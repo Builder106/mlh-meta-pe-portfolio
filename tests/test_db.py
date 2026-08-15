@@ -1,9 +1,10 @@
 import os
-os.environ.setdefault("TESTING", "true")
-import peewee
 
+os.environ.setdefault("TESTING", "true")
 import unittest
 from datetime import date, datetime
+
+import peewee
 
 from app import TimelinePost, _ordered_posts
 
@@ -43,7 +44,7 @@ class TestTimelinePost(unittest.TestCase):
         self.assertEqual(len(posts), 2)
         self.assertEqual({p.name for p in posts}, {"Ada Lovelace", "Grace Hopper"})
 
-    
+
     # Add by Chloe from here
 
     def test_ordered_posts_sorts_by_event_date_desc(self):

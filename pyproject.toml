@@ -41,9 +41,6 @@ filterwarnings = ["ignore::pytest.PytestCollectionWarning"]
 [tool.ruff]
 target-version = "py312"
 line-length = 100
-indent-width = 4
-indent-style = "space"
-skip-magic-trailing-comma = false
 src = ["."]
 exclude = [
     ".git",
@@ -79,21 +76,26 @@ select = [
     "TD",  # flake8-todo
 ]
 ignore = [
-    "E501",  # line too long (handled by formatter)
-    "B008",  # function calls in default arguments (sometimes intentional)
+    "E501",    # line too long (handled by formatter)
+    "B008",    # function calls in default arguments (sometimes intentional)
     "PLR0913", # too many arguments (sometimes necessary)
     "TRY003",  # avoid specifying long messages outside the exception class
     "TD001",   # TODO comments (allow for now)
+    "TD002",   # missing author in TODO
+    "TD003",   # missing issue link in TODO
+    "TD004",   # missing colon in TODO
+    "RUF001",  # ambiguous Unicode characters (intentional: ×, –, α in content)
+    "RUF002",  # ambiguous Unicode in docstrings
+    "ERA001",  # commented-out code (deploy-log reference comment)
+    "PLW1508", # env-var default type (int wrapper is intentional)
+    "ARG001",  # unused function argument (Flask teardown pattern)
 ]
-per-file-ignores = {
-    "tests/*" = ["S101", "S106", "S311", "PL012"],  # test-specific allows
-}
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101", "S106", "S311", "PLR2004"]  # test-specific allows
 
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
-indent-width = 4
-line-width = 100
 docstring-code-format = true
 docstring-code-line-length = 88
 
