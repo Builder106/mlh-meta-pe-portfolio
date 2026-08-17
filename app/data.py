@@ -165,8 +165,7 @@ PROFILE = {
         },
         {
             "institution": "Dominican University of California",
-            "credential": "ACS-4996 — Supervised Work Experience "
-            "(MLH × Meta Fellowship)",
+            "credential": "ACS-4996 — Supervised Work Experience " "(MLH × Meta Fellowship)",
             "location": "Remote · Summer 2026",
             "term": "2026",
             "detail": "Concurrent enrollment carrying the MLH Production "

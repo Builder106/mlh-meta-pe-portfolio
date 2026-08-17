@@ -37,12 +37,8 @@ class TestTimelinePost(unittest.TestCase):
         # TODO: create a couple of TimelinePost rows, then confirm listing
         # them returns everything. See app/__init__.py's _ordered_posts() /
         # TimelinePost.select() for how the app itself lists posts.
-        TimelinePost.create(
-            name="Ada Lovelace", email="ada@example.com", content="first"
-        )
-        TimelinePost.create(
-            name="Grace Hopper", email="grace@example.com", content="second"
-        )
+        TimelinePost.create(name="Ada Lovelace", email="ada@example.com", content="first")
+        TimelinePost.create(name="Grace Hopper", email="grace@example.com", content="second")
 
         posts = list(TimelinePost.select())
 
