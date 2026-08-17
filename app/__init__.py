@@ -10,11 +10,14 @@ import itertools
 import os
 import re
 from datetime import UTC, datetime
+from typing import Any
 
 from dotenv import load_dotenv
 from flask import Flask, jsonify, render_template, request, url_for
 from peewee import (
+    AutoField,
     CharField,
+    Database,
     DateField,
     DateTimeField,
     Model,
@@ -36,6 +39,7 @@ app = Flask(__name__)
 # SQLite database instead of requiring a real MySQL instance.
 TESTING = os.getenv("TESTING", "false").lower() == "true"
 
+db: Database
 if TESTING:
     db = SqliteDatabase(":memory:")
 else:
@@ -58,6 +62,7 @@ class TimelinePost(Model):
     post is backfilled instead of written the day of.
     """
 
+    id = AutoField()
     name = CharField()
     email = CharField()
     content = TextField()
@@ -84,11 +89,7 @@ if not TESTING:
             )
         )
     if "image" not in existing_columns:
-        migrate(
-            migrator.add_column(
-                TimelinePost._meta.table_name, "image", TimelinePost.image
-            )
-        )
+        migrate(migrator.add_column(TimelinePost._meta.table_name, "image", TimelinePost.image))
 if not TESTING:
     db.close()
 # When TESTING, leave the in-memory SQLite connection open — closing it
@@ -169,9 +170,7 @@ def _ordered_posts():
     """Posts ordered by their real-world date (event_date, falling back to the
     day they were posted), newest first."""
     order = fn.COALESCE(TimelinePost.event_date, fn.DATE(TimelinePost.created_at))
-    return list(
-        TimelinePost.select().order_by(order.desc(), TimelinePost.created_at.desc())
-    )
+    return list(TimelinePost.select().order_by(order.desc(), TimelinePost.created_at.desc()))
 
 
 @app.route("/timeline")
@@ -261,7 +260,7 @@ def health():
     reporting that the process is alive, so hitting this endpoint exercises
     mysql (and, since it is reached through the reverse proxy, nginx too).
     """
-    checks = {}
+    checks: dict[str, Any] = {}
     overall_ok = True
 
     start = datetime.now(UTC)
@@ -281,11 +280,14 @@ def health():
     checks["myportfolio"] = {"ok": True}
 
     status_code = 200 if overall_ok else 503
-    return jsonify(
-        status="ok" if overall_ok else "degraded",
-        checks=checks,
-        ts=datetime.now(UTC).isoformat(),
-    ), status_code
+    return (
+        jsonify(
+            status="ok" if overall_ok else "degraded",
+            checks=checks,
+            ts=datetime.now(UTC).isoformat(),
+        ),
+        status_code,
+    )
 
 
 @app.errorhandler(404)

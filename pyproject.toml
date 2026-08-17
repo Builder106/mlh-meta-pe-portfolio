@@ -134,13 +134,23 @@ pretty = true
 
 [[tool.mypy.overrides]]
 module = [
-    "flask*",
-    "werkzeug*",
-    "jinja2*",
-    "peewee*",
-    "pymysql*",
-    "cryptography*",
-    "gunicorn*",
-    "pytest*",
+    "flask",
+    "flask.*",
+    "werkzeug",
+    "werkzeug.*",
+    "jinja2",
+    "jinja2.*",
+    "peewee",
+    "peewee.*",
+    "playhouse",
+    "playhouse.*",
+    "pymysql",
+    "pymysql.*",
+    "cryptography",
+    "cryptography.*",
+    "gunicorn",
+    "gunicorn.*",
+    "pytest",
+    "pytest.*",
 ]
 ignore_missing_imports = true
