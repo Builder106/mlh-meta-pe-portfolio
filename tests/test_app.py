@@ -2,6 +2,7 @@
 an isolated in-memory SQLite database (TESTING=true), not the app's own
 MySQL connection.
 """
+
 import os
 
 os.environ.setdefault("TESTING", "true")
@@ -17,11 +18,14 @@ class TestTimelineEndpoints(unittest.TestCase):
 
     # TODO 1: creating a post
     def test_create_timeline_post(self):
-        resp = self.client.post("/api/timeline_post", json={
-            "name": "Grace Hopper",
-            "email": "grace@example.com",
-            "content": "Found the first bug.",
-        })
+        resp = self.client.post(
+            "/api/timeline_post",
+            json={
+                "name": "Grace Hopper",
+                "email": "grace@example.com",
+                "content": "Found the first bug.",
+            },
+        )
         self.assertEqual(resp.status_code, 201)
         body = resp.get_json()
         self.assertEqual(body["name"], "Grace Hopper")
@@ -29,10 +33,14 @@ class TestTimelineEndpoints(unittest.TestCase):
 
     # TODO 2: listing posts
     def test_list_timeline_posts(self):
-        created = self.client.post("/api/timeline_post", json={
-            "name": "Grace Hopper", "email": "grace@example.com",
-            "content": "Found the first bug.",
-        }).get_json()
+        created = self.client.post(
+            "/api/timeline_post",
+            json={
+                "name": "Grace Hopper",
+                "email": "grace@example.com",
+                "content": "Found the first bug.",
+            },
+        ).get_json()
 
         resp = self.client.get("/api/timeline_post")
 
@@ -42,10 +50,14 @@ class TestTimelineEndpoints(unittest.TestCase):
 
     # TODO 3: deleting a post
     def test_delete_timeline_post(self):
-        created = self.client.post("/api/timeline_post", json={
-            "name": "Grace Hopper", "email": "grace@example.com",
-            "content": "Found the first bug.",
-        }).get_json()
+        created = self.client.post(
+            "/api/timeline_post",
+            json={
+                "name": "Grace Hopper",
+                "email": "grace@example.com",
+                "content": "Found the first bug.",
+            },
+        ).get_json()
 
         resp = self.client.delete(f"/api/timeline_post/{created['id']}")
 
@@ -56,17 +68,25 @@ class TestTimelineEndpoints(unittest.TestCase):
     # --- TDD: written before the app supported them, both drove a fix ---
 
     def test_create_timeline_post_rejects_malformed_email(self):
-        resp = self.client.post("/api/timeline_post", json={
-            "name": "Ada Lovelace", "email": "not-an-email",
-            "content": "Shipped the first program.",
-        })
+        resp = self.client.post(
+            "/api/timeline_post",
+            json={
+                "name": "Ada Lovelace",
+                "email": "not-an-email",
+                "content": "Shipped the first program.",
+            },
+        )
         self.assertEqual(resp.status_code, 400)
 
     def test_get_single_timeline_post(self):
-        created = self.client.post("/api/timeline_post", json={
-            "name": "Ada Lovelace", "email": "ada@example.com",
-            "content": "Shipped the first program.",
-        }).get_json()
+        created = self.client.post(
+            "/api/timeline_post",
+            json={
+                "name": "Ada Lovelace",
+                "email": "ada@example.com",
+                "content": "Shipped the first program.",
+            },
+        ).get_json()
 
         resp = self.client.get(f"/api/timeline_post/{created['id']}")
 
@@ -85,53 +105,83 @@ class TestTimelineEndpoints(unittest.TestCase):
         self.assertEqual(resp.status_code, 404)
 
     def test_create_timeline_post_missing_name(self):
-        resp = self.client.post("/api/timeline_post", json={
-            "email": "ada@example.com", "content": "Shipped the first program.",
-        })
+        resp = self.client.post(
+            "/api/timeline_post",
+            json={
+                "email": "ada@example.com",
+                "content": "Shipped the first program.",
+            },
+        )
         self.assertEqual(resp.status_code, 400)
 
     def test_create_timeline_post_missing_email(self):
-        resp = self.client.post("/api/timeline_post", json={
-            "name": "Ada Lovelace", "content": "Shipped the first program.",
-        })
+        resp = self.client.post(
+            "/api/timeline_post",
+            json={
+                "name": "Ada Lovelace",
+                "content": "Shipped the first program.",
+            },
+        )
         self.assertEqual(resp.status_code, 400)
 
     def test_create_timeline_post_missing_content(self):
-        resp = self.client.post("/api/timeline_post", json={
-            "name": "Ada Lovelace", "email": "ada@example.com",
-        })
+        resp = self.client.post(
+            "/api/timeline_post",
+            json={
+                "name": "Ada Lovelace",
+                "email": "ada@example.com",
+            },
+        )
         self.assertEqual(resp.status_code, 400)
 
     def test_create_timeline_post_whitespace_only_fields_rejected(self):
-        resp = self.client.post("/api/timeline_post", json={
-            "name": "   ", "email": "ada@example.com", "content": "Shipped the first program.",
-        })
+        resp = self.client.post(
+            "/api/timeline_post",
+            json={
+                "name": "   ",
+                "email": "ada@example.com",
+                "content": "Shipped the first program.",
+            },
+        )
         self.assertEqual(resp.status_code, 400)
 
     def test_create_timeline_post_accepts_local_static_image(self):
-        created = self.client.post("/api/timeline_post", json={
-            "name": "Ada Lovelace", "email": "ada@example.com",
-            "content": "Shipped the first program.", "image": "/static/photos/ada.jpg",
-        }).get_json()
+        created = self.client.post(
+            "/api/timeline_post",
+            json={
+                "name": "Ada Lovelace",
+                "email": "ada@example.com",
+                "content": "Shipped the first program.",
+                "image": "/static/photos/ada.jpg",
+            },
+        ).get_json()
 
         self.assertEqual(created["image"], "/static/photos/ada.jpg")
         self.client.delete(f"/api/timeline_post/{created['id']}")
 
     def test_create_timeline_post_accepts_form_encoded_body(self):
-        resp = self.client.post("/api/timeline_post", data={
-            "name": "Ada Lovelace", "email": "ada@example.com",
-            "content": "Shipped the first program.",
-        })
+        resp = self.client.post(
+            "/api/timeline_post",
+            data={
+                "name": "Ada Lovelace",
+                "email": "ada@example.com",
+                "content": "Shipped the first program.",
+            },
+        )
         self.assertEqual(resp.status_code, 201)
         body = resp.get_json()
         self.assertEqual(body["name"], "Ada Lovelace")
         self.client.delete(f"/api/timeline_post/{body['id']}")
 
     def test_get_timeline_post_null_fields_round_trip(self):
-        created = self.client.post("/api/timeline_post", json={
-            "name": "Ada Lovelace", "email": "ada@example.com",
-            "content": "Shipped the first program.",
-        }).get_json()
+        created = self.client.post(
+            "/api/timeline_post",
+            json={
+                "name": "Ada Lovelace",
+                "email": "ada@example.com",
+                "content": "Shipped the first program.",
+            },
+        ).get_json()
 
         resp = self.client.get(f"/api/timeline_post/{created['id']}")
 

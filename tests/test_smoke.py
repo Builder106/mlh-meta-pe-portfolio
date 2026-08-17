@@ -3,6 +3,7 @@
 These run in CI on every PR. A malformed PROFILE field 500s the page and
 fails CI before merge.
 """
+
 import app as application
 
 
@@ -27,9 +28,14 @@ def test_healthz_counts_hobbies():
 
 def test_timeline_post_create_and_list():
     c = client()
-    created = c.post("/api/timeline_post", json={
-        "name": "CI Runner", "email": "ci@example.com", "content": "smoke test post",
-    })
+    created = c.post(
+        "/api/timeline_post",
+        json={
+            "name": "CI Runner",
+            "email": "ci@example.com",
+            "content": "smoke test post",
+        },
+    )
     assert created.status_code == 201, created.get_data(as_text=True)
     post_id = created.get_json()["id"]
 
@@ -46,10 +52,15 @@ def test_timeline_post_requires_fields():
 
 def test_timeline_post_with_event_date():
     c = client()
-    created = c.post("/api/timeline_post", json={
-        "name": "CI Runner", "email": "ci@example.com",
-        "content": "backfilled update", "event_date": "2024-12-13",
-    })
+    created = c.post(
+        "/api/timeline_post",
+        json={
+            "name": "CI Runner",
+            "email": "ci@example.com",
+            "content": "backfilled update",
+            "event_date": "2024-12-13",
+        },
+    )
     assert created.status_code == 201, created.get_data(as_text=True)
     body = created.get_json()
     assert body["event_date"] == "2024-12-13"
@@ -58,19 +69,29 @@ def test_timeline_post_with_event_date():
 
 
 def test_timeline_post_rejects_malformed_event_date():
-    resp = client().post("/api/timeline_post", json={
-        "name": "CI Runner", "email": "ci@example.com",
-        "content": "bad date", "event_date": "not-a-date",
-    })
+    resp = client().post(
+        "/api/timeline_post",
+        json={
+            "name": "CI Runner",
+            "email": "ci@example.com",
+            "content": "bad date",
+            "event_date": "not-a-date",
+        },
+    )
     assert resp.status_code == 400
 
 
 def test_timeline_post_with_image():
     c = client()
-    created = c.post("/api/timeline_post", json={
-        "name": "CI Runner", "email": "ci@example.com",
-        "content": "with an image", "image": "https://example.com/shot.png",
-    })
+    created = c.post(
+        "/api/timeline_post",
+        json={
+            "name": "CI Runner",
+            "email": "ci@example.com",
+            "content": "with an image",
+            "image": "https://example.com/shot.png",
+        },
+    )
     assert created.status_code == 201, created.get_data(as_text=True)
     body = created.get_json()
     assert body["image"] == "https://example.com/shot.png"
@@ -79,8 +100,13 @@ def test_timeline_post_with_image():
 
 
 def test_timeline_post_rejects_non_url_image():
-    resp = client().post("/api/timeline_post", json={
-        "name": "CI Runner", "email": "ci@example.com",
-        "content": "bad image", "image": "javascript:alert(1)",
-    })
+    resp = client().post(
+        "/api/timeline_post",
+        json={
+            "name": "CI Runner",
+            "email": "ci@example.com",
+            "content": "bad image",
+            "image": "javascript:alert(1)",
+        },
+    )
     assert resp.status_code == 400

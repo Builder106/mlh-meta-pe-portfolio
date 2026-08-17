@@ -5,6 +5,7 @@ header, ``whoami``, ``deploy.log``, build provenance, edge network — and
 ``/ps_aux`` is the background-process (hobbies) view. All content comes from
 ``app.data.PROFILE`` so templates stay logic-light.
 """
+
 import itertools
 import os
 import re
@@ -77,9 +78,17 @@ if not TESTING:
     existing_columns = {c.name for c in db.get_columns(TimelinePost._meta.table_name)}
     migrator = MySQLMigrator(db)
     if "event_date" not in existing_columns:
-        migrate(migrator.add_column(TimelinePost._meta.table_name, "event_date", TimelinePost.event_date))
+        migrate(
+            migrator.add_column(
+                TimelinePost._meta.table_name, "event_date", TimelinePost.event_date
+            )
+        )
     if "image" not in existing_columns:
-        migrate(migrator.add_column(TimelinePost._meta.table_name, "image", TimelinePost.image))
+        migrate(
+            migrator.add_column(
+                TimelinePost._meta.table_name, "image", TimelinePost.image
+            )
+        )
 if not TESTING:
     db.close()
 # When TESTING, leave the in-memory SQLite connection open — closing it
@@ -119,8 +128,16 @@ def inject_globals():
     """Expose the profile and a fixed nav to every template."""
     nav = [
         {"label": "Home", "url": url_for("home"), "active": request.endpoint == "home"},
-        {"label": "Hobbies", "url": url_for("hobbies"), "active": request.endpoint == "hobbies"},
-        {"label": "Timeline", "url": url_for("timeline"), "active": request.endpoint == "timeline"},
+        {
+            "label": "Hobbies",
+            "url": url_for("hobbies"),
+            "active": request.endpoint == "hobbies",
+        },
+        {
+            "label": "Timeline",
+            "url": url_for("timeline"),
+            "active": request.endpoint == "timeline",
+        },
     ]
     return {
         "nav": nav,
@@ -132,21 +149,29 @@ def inject_globals():
 
 @app.route("/")
 def home():
-    return render_template("home.html", title=f"{data.PROFILE['name']} — {data.PROFILE['role']}",
-                           profile=data.PROFILE)
+    return render_template(
+        "home.html",
+        title=f"{data.PROFILE['name']} — {data.PROFILE['role']}",
+        profile=data.PROFILE,
+    )
 
 
 @app.route("/ps_aux")
 def hobbies():
-    return render_template("hobbies.html", title=f"Hobbies — {data.PROFILE['name']}",
-                           procs=data.PROFILE["hobbies"])
+    return render_template(
+        "hobbies.html",
+        title=f"Hobbies — {data.PROFILE['name']}",
+        procs=data.PROFILE["hobbies"],
+    )
 
 
 def _ordered_posts():
     """Posts ordered by their real-world date (event_date, falling back to the
     day they were posted), newest first."""
     order = fn.COALESCE(TimelinePost.event_date, fn.DATE(TimelinePost.created_at))
-    return list(TimelinePost.select().order_by(order.desc(), TimelinePost.created_at.desc()))
+    return list(
+        TimelinePost.select().order_by(order.desc(), TimelinePost.created_at.desc())
+    )
 
 
 @app.route("/timeline")
@@ -156,10 +181,13 @@ def timeline():
         post.month_label = display_date(post).strftime("%B %Y")
         post.day_label = display_date(post).strftime("%b %d")
         post.is_latest = i == 0
-    groups = [{"label": label, "posts": list(group)}
-              for label, group in itertools.groupby(posts, key=lambda p: p.month_label)]
-    return render_template("timeline.html",
-                           title=f"Timeline — {data.PROFILE['name']}", groups=groups)
+    groups = [
+        {"label": label, "posts": list(group)}
+        for label, group in itertools.groupby(posts, key=lambda p: p.month_label)
+    ]
+    return render_template(
+        "timeline.html", title=f"Timeline — {data.PROFILE['name']}", groups=groups
+    )
 
 
 @app.route("/api/timeline_post", methods=["POST"])
@@ -182,8 +210,13 @@ def create_timeline_post():
             return jsonify(error="event_date must be YYYY-MM-DD"), 400
     if image and not image.startswith(("http://", "https://", "/static/")):
         return jsonify(error="image must be an http(s) URL"), 400
-    post = TimelinePost.create(name=name, email=email, content=content,
-                               event_date=event_date, image=image or None)
+    post = TimelinePost.create(
+        name=name,
+        email=email,
+        content=content,
+        event_date=event_date,
+        image=image or None,
+    )
     return jsonify(serialize_post(post)), 201
 
 
@@ -236,7 +269,11 @@ def health():
         db.connect(reuse_if_open=True)
         post_count = TimelinePost.select().count()
         latency_ms = (datetime.now(UTC) - start).total_seconds() * 1000
-        checks["mysql"] = {"ok": True, "latency_ms": round(latency_ms, 2), "row_count": post_count}
+        checks["mysql"] = {
+            "ok": True,
+            "latency_ms": round(latency_ms, 2),
+            "row_count": post_count,
+        }
     except Exception as exc:
         overall_ok = False
         checks["mysql"] = {"ok": False, "error": str(exc)}
@@ -244,8 +281,11 @@ def health():
     checks["myportfolio"] = {"ok": True}
 
     status_code = 200 if overall_ok else 503
-    return jsonify(status="ok" if overall_ok else "degraded", checks=checks,
-                   ts=datetime.now(UTC).isoformat()), status_code
+    return jsonify(
+        status="ok" if overall_ok else "degraded",
+        checks=checks,
+        ts=datetime.now(UTC).isoformat(),
+    ), status_code
 
 
 @app.errorhandler(404)

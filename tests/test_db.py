@@ -10,6 +10,7 @@ from app import TimelinePost, _ordered_posts
 
 test_db = peewee.SqliteDatabase(":memory:")
 
+
 class TestTimelinePost(unittest.TestCase):
     def setUp(self):
         self._ctx = test_db.bind_ctx([TimelinePost])
@@ -36,41 +37,66 @@ class TestTimelinePost(unittest.TestCase):
         # TODO: create a couple of TimelinePost rows, then confirm listing
         # them returns everything. See app/__init__.py's _ordered_posts() /
         # TimelinePost.select() for how the app itself lists posts.
-        TimelinePost.create(name="Ada Lovelace", email="ada@example.com", content="first")
-        TimelinePost.create(name="Grace Hopper", email="grace@example.com", content="second")
+        TimelinePost.create(
+            name="Ada Lovelace", email="ada@example.com", content="first"
+        )
+        TimelinePost.create(
+            name="Grace Hopper", email="grace@example.com", content="second"
+        )
 
         posts = list(TimelinePost.select())
 
         self.assertEqual(len(posts), 2)
         self.assertEqual({p.name for p in posts}, {"Ada Lovelace", "Grace Hopper"})
 
-
     # Add by Chloe from here
 
     def test_ordered_posts_sorts_by_event_date_desc(self):
-        TimelinePost.create(name="A", email="a@example.com", content="a", event_date=date(2024, 1, 1))
-        TimelinePost.create(name="B", email="b@example.com", content="b", event_date=date(2024, 6, 1))
-        TimelinePost.create(name="C", email="c@example.com", content="c", event_date=date(2024, 3, 1))
+        TimelinePost.create(
+            name="A", email="a@example.com", content="a", event_date=date(2024, 1, 1)
+        )
+        TimelinePost.create(
+            name="B", email="b@example.com", content="b", event_date=date(2024, 6, 1)
+        )
+        TimelinePost.create(
+            name="C", email="c@example.com", content="c", event_date=date(2024, 3, 1)
+        )
 
         ordered = _ordered_posts()
 
         self.assertEqual([p.name for p in ordered], ["B", "C", "A"])
 
     def test_ordered_posts_falls_back_to_created_at_when_event_date_missing(self):
-        TimelinePost.create(name="Older", email="o@example.com", content="o",
-                            created_at=datetime(2024, 1, 1))
-        TimelinePost.create(name="Newer", email="n@example.com", content="n",
-                            created_at=datetime(2024, 6, 1))
+        TimelinePost.create(
+            name="Older",
+            email="o@example.com",
+            content="o",
+            created_at=datetime(2024, 1, 1),
+        )
+        TimelinePost.create(
+            name="Newer",
+            email="n@example.com",
+            content="n",
+            created_at=datetime(2024, 6, 1),
+        )
 
         ordered = _ordered_posts()
 
         self.assertEqual([p.name for p in ordered], ["Newer", "Older"])
 
     def test_ordered_posts_mixes_event_date_and_created_at_fallback(self):
-        TimelinePost.create(name="Backfilled", email="b@example.com", content="b",
-                            event_date=date(2024, 1, 1))
-        TimelinePost.create(name="Undated", email="u@example.com", content="u",
-                            created_at=datetime(2024, 5, 1))
+        TimelinePost.create(
+            name="Backfilled",
+            email="b@example.com",
+            content="b",
+            event_date=date(2024, 1, 1),
+        )
+        TimelinePost.create(
+            name="Undated",
+            email="u@example.com",
+            content="u",
+            created_at=datetime(2024, 5, 1),
+        )
 
         ordered = _ordered_posts()
 
