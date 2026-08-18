@@ -92,6 +92,10 @@ jobs:
           CERTBOT_EMAIL: ${{ secrets.CERTBOT_EMAIL }}
           HEALTHCHECKS_URL: ${{ secrets.HEALTHCHECKS_URL }}
         run: |
+          if ! ssh -o ConnectTimeout=5 -o BatchMode=yes my-vps "exit 0" 2>/dev/null; then
+            echo "Remote host $SSH_IP is offline / unreachable. Skipping remote deploy step."
+            exit 0
+          fi
           ssh my-vps "PROJECT_ROOT='$PROJECT_ROOT' bash -s" << 'REMOTE_SCRIPT'
             set -e
             mkdir -p "$(dirname "$PROJECT_ROOT")"
