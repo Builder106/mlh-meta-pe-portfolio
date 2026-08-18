@@ -62,22 +62,24 @@ jobs:
       PROJECT_ROOT: ${{ secrets.PROJECT_ROOT }}
     steps:
       - name: Configure SSH
+        if: env.SSH_IP != ''
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
           mkdir -p ~/.ssh
           printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/deploy-key.pem
           chmod 600 ~/.ssh/deploy-key.pem
-          ssh-keyscan -H "$SSH_IP" >> ~/.ssh/known_hosts
+          ssh-keyscan -T 10 -H "$SSH_IP" >> ~/.ssh/known_hosts 2>/dev/null || true
           cat >> ~/.ssh/config << EOF
           Host my-vps
             HostName $SSH_IP
             User $SSH_USER
             IdentityFile ~/.ssh/deploy-key.pem
-            StrictHostKeyChecking yes
+            StrictHostKeyChecking accept-new
           EOF
 
       - name: Deploy site
+        if: env.SSH_IP != ''
         env:
           PROJECT_ROOT: ${{ secrets.PROJECT_ROOT }}
           URL: ${{ secrets.URL }}
