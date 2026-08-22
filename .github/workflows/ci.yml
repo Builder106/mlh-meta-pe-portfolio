@@ -117,4 +117,6 @@ jobs:
 
       # Boots the app and asserts every route — incl. each member page — serves.
       - name: Smoke test
-        run: pytest -q
+        env:
+          PYTHONWARNINGS: "error"
+        run: pytest -q -W error
