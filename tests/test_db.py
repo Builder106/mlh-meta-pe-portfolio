@@ -8,17 +8,18 @@ import peewee
 
 from app import TimelinePost, _ordered_posts
 
-test_db = peewee.SqliteDatabase(":memory:")
+MODELS = [TimelinePost]
+db = peewee.SqliteDatabase(":memory:")
 
 
 class TestTimelinePost(unittest.TestCase):
     def setUp(self):
-        self._ctx = test_db.bind_ctx([TimelinePost])
+        self._ctx = db.bind_ctx(MODELS)
         self._ctx.__enter__()
-        test_db.create_tables([TimelinePost])
+        db.create_tables(MODELS)
 
     def tearDown(self):
-        test_db.drop_tables([TimelinePost])
+        db.drop_tables(MODELS)
         self._ctx.__exit__(None, None, None)
 
     def test_create_and_retrieve_post(self):
