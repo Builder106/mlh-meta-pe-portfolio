@@ -10,7 +10,7 @@ import itertools
 import os
 import re
 from datetime import UTC, datetime
-from typing import Any
+from typing import TypedDict
 
 from dotenv import load_dotenv
 from flask import Flask, jsonify, render_template, request, url_for
@@ -254,13 +254,20 @@ def healthz():
     )
 
 
+class HealthCheckResult(TypedDict, total=False):
+    ok: bool
+    latency_ms: float
+    row_count: int
+    error: str
+
+
 @app.route("/health")
 def health():
     """Dependency probe — actually touches the database instead of just
     reporting that the process is alive, so hitting this endpoint exercises
     mysql (and, since it is reached through the reverse proxy, nginx too).
     """
-    checks: dict[str, Any] = {}
+    checks: dict[str, HealthCheckResult] = {}
     overall_ok = True
 
     start = datetime.now(UTC)
