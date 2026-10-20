@@ -63,13 +63,7 @@ returns the service's status as JSON, because of course a service has one.
 
 ## How it works
 
-```mermaid
-flowchart LR
-    A[data.py<br/>PROFILE] --> B[Flask routes<br/>app/__init__.py]
-    B --> C[Jinja templates<br/>base + macros]
-    C --> D[(rendered HTML)]
-    C -. Leaflet + CARTO tiles .-> D
-```
+Flask routes read the `PROFILE` dict from `app/data.py` and render it through Jinja templates. The home page adds a Leaflet map of places with CARTO tiles.
 
 - **`app/data.py`** holds `PROFILE` — a single dict with about / experience /
 

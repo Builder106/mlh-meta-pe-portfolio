@@ -2,6 +2,10 @@
 
 > Dated log of decisions and notes. Reverse-chronological; one paragraph max.
 
+## 2026-10-19: Replace the README flowchart with a sentence #decision
+
+The flowchart drew a three-step chain (data, routes, templates) that the bullets under it already explain. One sentence covers it, and it now says the Leaflet map is on the home page.
+
 ## 2026-07-20 — Added dockerized nginx-certbot for HTTPS #decision
 
 Week 6 Task 3 fronts the app with an nginx service (`jonasal/nginx-certbot`)
